@@ -12,16 +12,13 @@ const SECTIONS = [
     title: 'Account',
     items: [
       { icon: 'person.circle',       label: 'Profile',            sub: 'Edit personal details'    },
-      { icon: 'lock.circle',         label: 'Security',           sub: 'Password & 2FA'           },
-      { icon: 'bell.circle',         label: 'Notifications',      sub: 'Manage alerts'            },
-    ],
-  },
-  {
-    title: 'Support',
-    items: [
-      { icon: 'questionmark.circle', label: 'Help Centre',        sub: 'FAQs and guides'          },
-      { icon: 'envelope.circle',     label: 'Contact Us',         sub: 'Reach the GHAFRA team'   },
-      { icon: 'doc.text',            label: 'Terms & Privacy',    sub: 'Legal information'        },
+      { icon: 'lock.circle',         label: 'GHAFRA Executives',           sub: 'Info About GHAFRA Executives'           },
+            { icon: 'questionmark.circle', label: 'Help Centre',        sub: 'FAQs and guides'          },
+      { icon: 'bell.circle',         label: 'About GHAFRA',      sub: 'Learn more about GHAFRA'            },
+            { icon: 'envelope.circle',     label: 'Contact Us',         sub: 'Reach the GHAFRA team'   },
+            { icon: 'doc.text',            label: 'Terms & Privacy',    sub: 'Legal information'        },
+
+
     ],
   },
 ];
