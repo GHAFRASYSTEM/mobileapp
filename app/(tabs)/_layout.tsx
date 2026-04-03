@@ -61,7 +61,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="(card)/index"
         options={{
-          title: 'My Card',
+          title: 'Account',
           tabBarIcon: ({ focused }) => (
             <View style={[
               styles.iconWrap,

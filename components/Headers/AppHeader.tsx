@@ -47,7 +47,7 @@ export default function AppHeader({
   if (onNotificationPress) {
     onNotificationPress();
   } else {
-    router.push('/(notification)'); // <-- routes to notification/index
+    router.push('/(standalone)/notifications'); // <-- routes to notification/index
   }
 };
 
@@ -138,7 +138,7 @@ export default function AppHeader({
         </View>
 
         {/* Right: notification bell only */}
-        <TouchableOpacity style={styles.iconBtn} onPress={onNotificationPress}>
+        <TouchableOpacity style={styles.iconBtn} onPress={handleNotificationPress}>
           <IconSymbol name="bell" size={18} color="#FFFFFF" />
           {hasNotification && (
             <View style={[styles.notifDot, { borderColor: headerBg }]} />

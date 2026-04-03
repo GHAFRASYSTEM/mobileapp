@@ -2,68 +2,89 @@ import React from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useColors } from '@/constants/Colors';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import AppHeader from '@/components/Headers/AppHeader';
-import type { SFSymbol } from 'expo-symbols';
 
-const SECTIONS = [
+type MenuItem = {
+  icon: any;
+  label: string;
+  sub: string;
+  route?: string;
+  action?: () => void;
+};
+
+const SECTIONS: { title: string; items: MenuItem[] }[] = [
   {
-    title: 'Account',
+    title: 'Membership',
     items: [
-      { icon: 'person.circle',       label: 'Profile',            sub: 'Edit personal details'    },
-      { icon: 'lock.circle',         label: 'GHAFRA Executives',           sub: 'Info About GHAFRA Executives'           },
-            { icon: 'questionmark.circle', label: 'Help Centre',        sub: 'FAQs and guides'          },
-      { icon: 'bell.circle',         label: 'About GHAFRA',      sub: 'Learn more about GHAFRA'            },
-            { icon: 'envelope.circle',     label: 'Contact Us',         sub: 'Reach the GHAFRA team'   },
-            { icon: 'doc.text',            label: 'Terms & Privacy',    sub: 'Legal information'        },
-
-
+      { icon: 'person.circle', label: 'Profile', sub: 'Edit personal details' },
+      { icon: 'person.2.circle', label: 'Executives', sub: 'GHAFRA leadership team' },
+      { icon: 'info.circle', label: 'About GHAFRA', sub: 'Learn about the association' },
+      { icon: 'questionmark.circle', label: 'Help Centre', sub: 'FAQs and support' },
+      { icon: 'envelope.circle', label: 'Contact Us', sub: 'Reach the GHAFRA team' },
+      { icon: 'doc.text', label: 'Terms & Privacy', sub: 'Legal information' },
+    ],
+  },
+  {
+    title: 'Preferences',
+    items: [
+      { icon: 'bell', label: 'Notifications', sub: 'Manage alerts' },
+      { icon: 'globe', label: 'Language', sub: 'Change app language' },
     ],
   },
 ];
 
 export default function MoreScreen() {
   const C = useColors();
+  const router = useRouter();
+
+  const handlePress = (item: MenuItem) => {
+    if (item.route) {
+      router.push(item.route);
+    } else if (item.action) {
+      item.action();
+    } else {
+      console.log('No route assigned:', item.label);
+    }
+  };
 
   return (
     <View style={[styles.safe, { backgroundColor: C.background }]}>
-        <AppHeader title="More" />
+      <AppHeader title="More" />
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Profile Card */}
-        <View style={[styles.profileCard, { backgroundColor: C.surface, borderColor: C.border }]}>
-          <View style={[styles.profileAvatar, { backgroundColor: C.gold }]}>
-            <Text style={[styles.profileInitials, { color: C.cardBg }]}>KA</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.profileName, { color: C.textPrimary }]}>Kwame Asante</Text>
-            <Text style={[styles.profileEmail, { color: C.textMuted }]}>kwame.asante@email.com</Text>
-            <View style={[styles.memberBadge, { backgroundColor: C.primarySubtle }]}>
-              <Text style={[styles.memberBadgeText, { color: C.primary }]}>Full Member · Valid</Text>
-            </View>
-          </View>
-          <TouchableOpacity>
-            <IconSymbol size={18} name="chevron.right" color={C.textMuted} />
-          </TouchableOpacity>
-        </View>
-
         {SECTIONS.map((section) => (
           <View key={section.title} style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: C.textMuted }]}>{section.title.toUpperCase()}</Text>
+            <Text style={[styles.sectionTitle, { color: C.textMuted }]}>
+              {section.title.toUpperCase()}
+            </Text>
+
             <View style={[styles.sectionCard, { backgroundColor: C.surface, borderColor: C.border }]}>
               {section.items.map((item, i) => (
                 <React.Fragment key={item.label}>
-                  <TouchableOpacity style={styles.menuRow}>
+                  <TouchableOpacity
+                    style={styles.menuRow}
+                    onPress={() => handlePress(item)}
+                    activeOpacity={0.7}
+                  >
                     <View style={[styles.menuIcon, { backgroundColor: C.primarySubtle }]}>
                       <IconSymbol size={18} name={item.icon} color={C.primary} />
                     </View>
+
                     <View style={{ flex: 1 }}>
-                      <Text style={[styles.menuLabel, { color: C.textPrimary }]}>{item.label}</Text>
-                      <Text style={[styles.menuSub, { color: C.textMuted }]}>{item.sub}</Text>
+                      <Text style={[styles.menuLabel, { color: C.textPrimary }]}>
+                        {item.label}
+                      </Text>
+                      <Text style={[styles.menuSub, { color: C.textMuted }]}>
+                        {item.sub}
+                      </Text>
                     </View>
+
                     <IconSymbol size={15} name="chevron.right" color={C.textMuted} />
                   </TouchableOpacity>
+
                   {i < section.items.length - 1 && (
                     <View style={[styles.divider, { backgroundColor: C.border }]} />
                   )}
@@ -74,12 +95,18 @@ export default function MoreScreen() {
         ))}
 
         {/* Sign Out */}
-        <TouchableOpacity style={[styles.signOutBtn, { backgroundColor: C.dangerSubtle, borderColor: C.borderDanger }]}>
+        <TouchableOpacity
+          style={[styles.signOutBtn, { backgroundColor: C.dangerSubtle, borderColor: C.borderDanger }]}
+          onPress={() => console.log('Sign out')}
+        >
           <IconSymbol size={18} name="rectangle.portrait.and.arrow.right" color={C.danger} />
           <Text style={[styles.signOutText, { color: C.danger }]}>Sign Out</Text>
         </TouchableOpacity>
 
-        <Text style={[styles.version, { color: C.textMuted }]}>GHAFRA v1.0.0</Text>
+        <Text style={[styles.version, { color: C.textMuted }]}>
+          GHAFRA v1.0.0
+        </Text>
+
         <View style={{ height: 100 }} />
       </ScrollView>
     </View>

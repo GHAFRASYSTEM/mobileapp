@@ -30,7 +30,6 @@ export default function HomeScreen() {
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Quick Actions */}
-        <Text style={[styles.sectionTitle, { color: C.textPrimary }]}>Quick Actions</Text>
         <View style={styles.grid}>
           {quickActions.map((a) => (
             <TouchableOpacity
@@ -40,7 +39,13 @@ export default function HomeScreen() {
               <View style={[styles.actionIcon, { backgroundColor: C.primarySubtle }]}>
                 <IconSymbol size={22} name={a.icon} color={C.primary} />
               </View>
-              <Text style={[styles.actionLabel, { color: C.textPrimary }]}>{a.label}</Text>
+              <Text
+  numberOfLines={1}
+  ellipsizeMode="tail"
+  style={[styles.actionLabel, { color: C.textPrimary }]}
+>
+  {a.label}
+</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -79,10 +84,24 @@ const styles = StyleSheet.create({
   validBadge:       { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 20 },
   validText:        { fontSize: 10, color: '#fff', fontWeight: '700', letterSpacing: 1 },
   sectionTitle:     { fontSize: 16, fontWeight: '700', marginBottom: 12 },
-  grid:             { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 },
-  actionTile:       { width: '47%', padding: 16, borderRadius: 14, borderWidth: 1, alignItems: 'flex-start', gap: 10 },
+grid: {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  justifyContent: 'space-between',
+  marginBottom: 24,
+},
+
+actionTile: {
+  width: '23%', // 👈 4 per row (with spacing)
+  paddingVertical: 14,
+  paddingHorizontal: 8,
+  borderRadius: 14,
+  borderWidth: 1,
+  alignItems: 'center',
+  marginBottom: 12,
+},
   actionIcon:       { width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  actionLabel:      { fontSize: 13, fontWeight: '600' },
+  actionLabel:      { fontSize: 11, fontWeight: '600' },
   announcementRow:  { flexDirection: 'row', alignItems: 'center', padding: 14, borderRadius: 12, borderWidth: 1, marginBottom: 10, gap: 10 },
   dot:              { width: 8, height: 8, borderRadius: 4 },
   announcementText: { flex: 1, fontSize: 13 },

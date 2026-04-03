@@ -1,0 +1,18 @@
+export const FRENCH_CITIES: string[] = [
+  'Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Montpellier',
+  'Strasbourg', 'Bordeaux', 'Lille', 'Rennes', 'Reims', 'Le Havre', 'Saint-Étienne',
+  'Toulon', 'Grenoble', 'Dijon', 'Angers', 'Nîmes', 'Villeurbanne', 'Le Mans',
+  'Aix-en-Provence', 'Clermont-Ferrand', 'Brest', 'Limoges', 'Tours', 'Amiens',
+  'Perpignan', 'Metz', 'Besançon', 'Boulogne-Billancourt', 'Orléans', 'Mulhouse',
+  'Rouen', 'Caen', 'Nancy', 'Saint-Denis', 'Argenteuil', 'Montreuil', 'Roubaix',
+  'Dunkerque', 'Tourcoing', 'Avignon', 'Nanterre', 'Poitiers', 'Versailles',
+  'Pau', 'Colombes', 'Fort-de-France', 'Créteil', 'Vitry-sur-Seine', 'Rueil-Malmaison',
+  'Champigny-sur-Marne', 'La Rochelle', 'Antibes', 'Cannes', 'Aubervilliers',
+  'Calais', 'Bourges', 'Saint-Maur-des-Fossés', 'Courbevoie', 'Béziers',
+  'Mérignac', 'Issy-les-Moulineaux', 'Troyes', 'Levallois-Perret', 'Drancy',
+  'Noisy-le-Grand', 'Quimper', 'La Seyne-sur-Mer', 'Neuilly-sur-Seine', 'Valence',
+  'Cergy', 'Aulnay-sous-Bois', 'Villeneuve-d\'Ascq', 'Pessac', 'Vénissieux',
+  'Annecy', 'Ivry-sur-Seine', 'Clichy', 'Lorient', 'Sartrouville', 'Évry',
+  'Bayonne', 'Cayenne', 'Épinay-sur-Seine', 'Pantin', 'Le Blanc-Mesnil',
+  'Meaux', 'Ajaccio', 'Montauban', 'Saint-Nazaire', 'Asnieres-sur-Seine',
+];

@@ -4,9 +4,44 @@ import { useColors } from '@/constants/Colors';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import AppHeader from '@/components/Headers/AppHeader';
 import MembershipCard from '@/components/Cards/MembershipCard';
+import { useRouter } from 'expo-router';
 
 export default function MyCardScreen() {
   const C = useColors();
+  const router = useRouter();
+
+type Route =
+  | '/(account)/profile'
+  | '/(account)/paydues'
+  | '/(account)/transactions';
+
+type Action = {
+  icon: any;
+  label: string;
+  sub: string;
+  route: Route;
+};
+
+const actions: Action[] = [
+  {
+    icon: 'person.crop.circle.fill',
+    label: 'Profile & Personal Data',
+    sub: 'Update your information',
+    route: '/(account)/profile',
+  },
+  {
+    icon: 'creditcard.fill',
+    label: 'Pay Dues / Donations',
+    sub: 'Make a payment quickly to support GHAFRA',
+    route: '/(account)/paydues',
+  },
+  {
+    icon: 'list.bullet.rectangle.fill',
+    label: 'View Transactions',
+    sub: 'See your dues payment history',
+    route: '/(account)/transactions',
+  },
+];
 
   return (
     <View style={[styles.safe, { backgroundColor: C.background }]}>
@@ -26,28 +61,31 @@ export default function MyCardScreen() {
           picture="https://media.istockphoto.com/id/1377248437/photo/shot-of-a-mature-man-spending-time-by-himself-in-his-yard.jpg?s=612x612&w=0&k=20&c=7RQdVcef45S4-K6HJeh1RMHFSxiRBxCBnjADCO1PnHQ="
           qrCode="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=GH-2024-00412"
         />
-
+        <View style={{ height: 20 }} />
         {/* Actions */}
-        {[
-          { icon: 'arrow.down.circle.fill', label: 'Download Card', sub: 'Save as PDF to your device' },
-          { icon: 'square.and.arrow.up', label: 'Share Card', sub: 'Send to contacts or apps' },
-          { icon: 'qrcode', label: 'Show QR Code', sub: 'For quick verification' },
-          { icon: 'exclamationmark.circle', label: 'Report Issue', sub: 'Something wrong with your card?' },
-        ].map((item) => (
-          <TouchableOpacity
-            key={item.label}
-            style={[styles.actionRow, { backgroundColor: C.surface, borderColor: C.border }]}
-          >
-            <View style={[styles.actionIcon, { backgroundColor: C.primarySubtle }]}>
-              <IconSymbol size={20} name={item.icon as any} color={C.primary} />
-            </View>
-            <View style={styles.actionText}>
-              <Text style={[styles.actionLabel, { color: C.textPrimary }]}>{item.label}</Text>
-              <Text style={[styles.actionSub, { color: C.textMuted }]}>{item.sub}</Text>
-            </View>
-            <IconSymbol size={16} name="chevron.right" color={C.textMuted} />
-          </TouchableOpacity>
-        ))}
+{actions.map((item) => (
+  <TouchableOpacity
+    key={item.label}
+    style={[styles.actionRow, { backgroundColor: C.surface, borderColor: C.border }]}
+    onPress={() => router.push(item.route)}
+    activeOpacity={0.7}
+  >
+    <View style={[styles.actionIcon, { backgroundColor: C.primarySubtle }]}>
+      <IconSymbol size={20} name={item.icon as any} color={C.primary} />
+    </View>
+
+    <View style={styles.actionText}>
+      <Text style={[styles.actionLabel, { color: C.textPrimary }]}>
+        {item.label}
+      </Text>
+      <Text style={[styles.actionSub, { color: C.textMuted }]}>
+        {item.sub}
+      </Text>
+    </View>
+
+    <IconSymbol size={16} name="chevron.right" color={C.textMuted} />
+  </TouchableOpacity>
+))}
 
         <View style={{ height: 100 }} />
       </ScrollView>

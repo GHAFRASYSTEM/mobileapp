@@ -23,9 +23,9 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
 
 
-        <Stack.Screen name="(notification)" options={{ headerShown: false }} />
+        <Stack.Screen name="(standalone)" options={{ headerShown: false }} />
 
-
+        <Stack.Screen name="(account)" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
