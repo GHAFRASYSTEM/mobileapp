@@ -6,17 +6,19 @@ import {
 import { useColors } from '../../../constants/Colors';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import AppHeader from '@/components/Headers/AppHeader';
+import { useRouter } from 'expo-router';
 
 
 export default function HomeScreen() {
+  const router = useRouter();
   const C = useColors();
 
-  const quickActions = [
-    { icon: 'creditcard.fill',  label: 'My Account'    },
-    { icon: 'person.2.fill',    label: 'Community'  },
-    { icon: 'play.rectangle.fill', label: 'Learn'  },
-    { icon: 'ellipsis.circle.fill', label: 'More'  },
-  ];
+const quickActions = [
+  { icon: 'creditcard.fill',  label: 'Pay Dues', route: '/(account)/paydues' },
+  { icon: 'person.2.fill',    label: 'About Us', route: '/(tabs)/(more)/aboutus' },
+  { icon: 'play.rectangle.fill', label: 'Learn', route: '/(tabs)/(learn)' },
+  { icon: 'ellipsis.circle.fill', label: 'Explore', route: '/(tabs)/(community)' },
+];
 
   return (
     <View style={[styles.safe, { backgroundColor: C.background }]}>
@@ -31,23 +33,25 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Quick Actions */}
         <View style={styles.grid}>
-          {quickActions.map((a) => (
-            <TouchableOpacity
-              key={a.label}
-              style={[styles.actionTile, { backgroundColor: C.surface, borderColor: C.border }]}
-            >
-              <View style={[styles.actionIcon, { backgroundColor: C.primarySubtle }]}>
-                <IconSymbol size={22} name={a.icon} color={C.primary} />
-              </View>
-              <Text
-  numberOfLines={1}
-  ellipsizeMode="tail"
-  style={[styles.actionLabel, { color: C.textPrimary }]}
->
-  {a.label}
-</Text>
-            </TouchableOpacity>
-          ))}
+{quickActions.map((a) => (
+  <TouchableOpacity
+    key={a.label}
+    style={[styles.actionTile, { backgroundColor: C.surface, borderColor: C.border }]}
+    onPress={() => router.push(a.route)}
+  >
+    <View style={[styles.actionIcon, { backgroundColor: C.primarySubtle }]}>
+      <IconSymbol size={22} name={a.icon} color={C.primary} />
+    </View>
+
+    <Text
+      numberOfLines={1}
+      ellipsizeMode="tail"
+      style={[styles.actionLabel, { color: C.textPrimary }]}
+    >
+      {a.label}
+    </Text>
+  </TouchableOpacity>
+))}
         </View>
 
         {/* Announcements */}
