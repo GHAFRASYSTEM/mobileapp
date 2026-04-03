@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  SafeAreaView, ScrollView,
+   ScrollView,
 } from 'react-native';
 import { useColors } from '@/constants/Colors';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import AppHeader from '@/components/Headers/AppHeader';
+
 
 const MODULES = [
   { id: '1', title: 'Membership Rights & Responsibilities', duration: '12 min', progress: 100, tag: 'Governance'  },
@@ -37,14 +39,11 @@ export default function LearnScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: C.background }]}>
-      <View style={[styles.header, { backgroundColor: C.surface, borderBottomColor: C.border }]}>
-        <Text style={[styles.pageTitle, { color: C.textPrimary }]}>Learn</Text>
-        <TouchableOpacity>
-          <IconSymbol size={20} name="magnifyingglass" color={C.textSecondary} />
-        </TouchableOpacity>
-      </View>
-
+    <View style={[styles.safe, { backgroundColor: C.background }]}>
+  <AppHeader
+    title="Learn"
+    rightIcon="magnifyingglass"
+  />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Progress Banner */}
         <View style={[styles.banner, { backgroundColor: C.primary }]}>
@@ -98,7 +97,7 @@ export default function LearnScreen() {
 
         <View style={{ height: 100 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

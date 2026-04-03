@@ -36,11 +36,11 @@ export const LightColors = {
   borderDanger:      '#CE1126',
 
   // Membership card (never changes between modes)
-  cardBg:            '#1A1A18',
-  cardStripe:        '#FCD116',
-  cardText:          '#F0EEE8',
-  cardMeta:          '#808078',
-  cardValid:         '#2DB875',
+cardBg:     '#FFFFFF',
+cardStripe: '#006B3F',   // Ghana green stripe
+cardText:   '#1A1A18',
+cardMeta:   '#6A6860',
+cardValid:  '#006B3F',
 
   // Status dots
   statusValid:       '#006B3F',

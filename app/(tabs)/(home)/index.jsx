@@ -1,50 +1,34 @@
 import React from 'react';
 import {
   ScrollView, View, Text, StyleSheet,
-  TouchableOpacity, Image, SafeAreaView,
+  TouchableOpacity, Image,
 } from 'react-native';
 import { useColors } from '../../../constants/Colors';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import AppHeader from '@/components/Headers/AppHeader';
+
 
 export default function HomeScreen() {
   const C = useColors();
 
   const quickActions = [
-    { icon: 'creditcard.fill',  label: 'My Card'    },
+    { icon: 'creditcard.fill',  label: 'My Account'    },
     { icon: 'person.2.fill',    label: 'Community'  },
     { icon: 'play.rectangle.fill', label: 'Learn'  },
     { icon: 'ellipsis.circle.fill', label: 'More'  },
   ];
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: C.background }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: C.header }]}>
-        <View>
-          <Text style={[styles.greeting, { color: C.textInverse }]}>Good morning 👋</Text>
-          <Text style={[styles.name, { color: C.textInverse }]}>Kwame Asante</Text>
-        </View>
-        <TouchableOpacity style={[styles.avatar, { backgroundColor: C.gold }]}>
-          <Text style={[styles.avatarText, { color: C.cardBg }]}>KA</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={[styles.safe, { backgroundColor: C.background }]}>
+        <AppHeader
+        variant="home"
+        greeting="Good morning 👋"
+        userName="Kwame Asante"
+        userInitials="KA"
+        hasNotification
+      />
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Membership Card Preview */}
-        <View style={[styles.card, { backgroundColor: C.cardBg }]}>
-          <View style={[styles.cardStripe, { backgroundColor: C.cardStripe }]} />
-          <View style={styles.cardBody}>
-            <Text style={[styles.cardLabel, { color: C.cardMeta }]}>MEMBERSHIP CARD</Text>
-            <Text style={[styles.cardName, { color: C.cardText }]}>Kwame Asante</Text>
-            <View style={styles.cardRow}>
-              <Text style={[styles.cardMeta, { color: C.cardMeta }]}>ID: GH-2024-00412</Text>
-              <View style={[styles.validBadge, { backgroundColor: C.cardValid }]}>
-                <Text style={styles.validText}>VALID</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
         {/* Quick Actions */}
         <Text style={[styles.sectionTitle, { color: C.textPrimary }]}>Quick Actions</Text>
         <View style={styles.grid}>
@@ -73,7 +57,7 @@ export default function HomeScreen() {
 
         <View style={{ height: 100 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

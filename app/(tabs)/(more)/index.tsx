@@ -1,10 +1,11 @@
 import React from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity,
-  SafeAreaView, ScrollView, Switch,
+  View, Text, StyleSheet, TouchableOpacity, ScrollView,
 } from 'react-native';
 import { useColors } from '@/constants/Colors';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import AppHeader from '@/components/Headers/AppHeader';
+import type { SFSymbol } from 'expo-symbols';
 
 const SECTIONS = [
   {
@@ -29,10 +30,8 @@ export default function MoreScreen() {
   const C = useColors();
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: C.background }]}>
-      <View style={[styles.header, { backgroundColor: C.surface, borderBottomColor: C.border }]}>
-        <Text style={[styles.pageTitle, { color: C.textPrimary }]}>More</Text>
-      </View>
+    <View style={[styles.safe, { backgroundColor: C.background }]}>
+        <AppHeader title="More" />
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Profile Card */}
@@ -86,7 +85,7 @@ export default function MoreScreen() {
         <Text style={[styles.version, { color: C.textMuted }]}>GHAFRA v1.0.0</Text>
         <View style={{ height: 100 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

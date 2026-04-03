@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  SafeAreaView, ScrollView, TextInput,
+  ScrollView, TextInput,
 } from 'react-native';
 import { useColors } from '@/constants/Colors';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import AppHeader from '@/components/Headers/AppHeader';
 
 const POSTS = [
   { id: '1', author: 'Ama Boateng',   time: '2h ago',  body: 'Does anyone know if the April meeting is still happening at the usual venue?',    likes: 4,  replies: 2 },
@@ -17,14 +18,12 @@ export default function CommunityScreen() {
   const [tab, setTab] = useState<'feed' | 'events'>('feed');
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: C.background }]}>
+    <View style={[styles.safe, { backgroundColor: C.background }]}>
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: C.surface, borderBottomColor: C.border }]}>
-        <Text style={[styles.pageTitle, { color: C.textPrimary }]}>Community</Text>
-        <TouchableOpacity>
-          <IconSymbol size={22} name="bell" color={C.textSecondary} />
-        </TouchableOpacity>
-      </View>
+  <AppHeader
+    title="Community"
+    rightIcon="bell"
+  />
 
       {/* Tabs */}
       <View style={[styles.tabRow, { backgroundColor: C.surface, borderBottomColor: C.border }]}>
@@ -100,7 +99,7 @@ export default function CommunityScreen() {
         )}
         <View style={{ height: 100 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
