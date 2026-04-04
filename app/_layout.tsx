@@ -1,7 +1,12 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+import {requestImagePermission} from "@/utils/requestImagePermission";
+import {requestNotificationPermission} from "@/utils/requestNotificationPermission";
+
+
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
@@ -10,6 +15,12 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
+
+  useEffect(() => {
+  requestImagePermission();
+  requestNotificationPermission();
+}, []);
+
   const colorScheme = useColorScheme();
 
   return (

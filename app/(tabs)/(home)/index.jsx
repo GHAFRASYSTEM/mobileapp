@@ -7,11 +7,23 @@ import { useColors } from '../../../constants/Colors';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import AppHeader from '@/components/Headers/AppHeader';
 import { useRouter } from 'expo-router';
+import UpcomingBanner from '@/components/Banners/UpcomingBanner';
+import { buildSchedule } from '../(community)/eventCalendar';
 
+function getUpcomingMeeting(year) {
+  const today = new Date(); 
+  today.setHours(0, 0, 0, 0);
+
+  const schedule = buildSchedule(year, year);
+
+  return schedule.find(m => m.date >= today) ?? null;
+}
 
 export default function HomeScreen() {
   const router = useRouter();
   const C = useColors();
+    const currentYear = new Date().getFullYear();
+  const upcoming = getUpcomingMeeting(currentYear);
 
 const quickActions = [
   { icon: 'creditcard.fill',  label: 'Pay Dues', route: '/(account)/paydues' },
@@ -31,6 +43,15 @@ const quickActions = [
       />
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          {upcoming && (
+  <TouchableOpacity
+    activeOpacity={0.9}
+    onPress={() => router.push('/(tabs)/(community)/eventCalendar')}
+  >
+    <UpcomingBanner meeting={upcoming} />
+  </TouchableOpacity>
+)}
+
         {/* Quick Actions */}
         <View style={styles.grid}>
 {quickActions.map((a) => (
@@ -53,18 +74,6 @@ const quickActions = [
   </TouchableOpacity>
 ))}
         </View>
-
-        {/* Announcements */}
-        <Text style={[styles.sectionTitle, { color: C.textPrimary }]}>Announcements</Text>
-        {['Annual General Meeting — Apr 20', 'New learning modules available'].map((item) => (
-          <View key={item} style={[styles.announcementRow, { backgroundColor: C.surface, borderColor: C.border }]}>
-            <View style={[styles.dot, { backgroundColor: C.primary }]} />
-            <Text style={[styles.announcementText, { color: C.textSecondary }]}>{item}</Text>
-            <IconSymbol size={16} name="chevron.right" color={C.textMuted} />
-          </View>
-        ))}
-
-        <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );
@@ -92,7 +101,7 @@ grid: {
   flexDirection: 'row',
   flexWrap: 'wrap',
   justifyContent: 'space-between',
-  marginBottom: 24,
+  marginVertical: 24,
 },
 
 actionTile: {
@@ -105,8 +114,5 @@ actionTile: {
   marginBottom: 12,
 },
   actionIcon:       { width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  actionLabel:      { fontSize: 11, fontWeight: '600' },
-  announcementRow:  { flexDirection: 'row', alignItems: 'center', padding: 14, borderRadius: 12, borderWidth: 1, marginBottom: 10, gap: 10 },
-  dot:              { width: 8, height: 8, borderRadius: 4 },
-  announcementText: { flex: 1, fontSize: 13 },
+  actionLabel:      { fontSize: 11, fontWeight: '600', paddingTop:8 },
 });

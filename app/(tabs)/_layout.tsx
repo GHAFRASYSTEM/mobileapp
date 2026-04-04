@@ -1,148 +1,136 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColors } from '@/constants/Colors';
 
+type TabIconProps = {
+  focused: boolean;
+  icon: string;
+  label: string;
+};
+
+function TabItem({ focused, icon, label }: TabIconProps) {
+  const C = useColors();
+
+  return (
+    <View style={styles.item}>
+      {/* Icon pill */}
+      <View
+        style={[
+          styles.pill,
+          focused
+            ? { backgroundColor: C.tabActive }
+            : { backgroundColor: 'transparent' },
+        ]}
+      >
+        <IconSymbol
+          size={30}
+          name={icon}
+          color={focused ? C.textInverse : C.tabInactive}
+        />
+      </View>
+
+      {/* Label — bold + primary when active, muted when not */}
+      <Text
+        style={[
+          styles.label,
+          focused
+            ? { color: C.tabActive,   fontWeight: '700' }
+            : { color: C.tabInactive, fontWeight: '400' },
+        ]}
+        numberOfLines={1}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+}
+
 export default function TabLayout() {
   const C = useColors();
+
+  const TABS = [
+    { name: '(home)/index',      label: 'Home',    icon: 'square.grid.2x2.fill' },
+    { name: '(card)/index',      label: 'My Card', icon: 'creditcard.fill'       },
+    { name: '(community)', label: 'Explore', icon: 'person.2.fill'         },
+    { name: '(learn)/index',     label: 'Learn',   icon: 'books.vertical.fill'   },
+    { name: '(more)',            label: 'More',    icon: 'ellipsis.circle.fill'  },
+  ];
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarActiveTintColor: C.tabActive,
-        tabBarInactiveTintColor: C.tabInactive,
+        // Hide the native label — we render our own inside TabItem
+        tabBarShowLabel: false,
         tabBarStyle: {
           backgroundColor: C.tabBar,
-          borderRadius: 32,
-          marginHorizontal: 16,
-          marginBottom: 24,
-          height: 72,
-          paddingBottom: 10,
-          paddingTop: 10,
+          borderRadius: 28,
+          marginHorizontal: 14,
+          marginBottom: Platform.OS === 'ios' ? 28 : 16,
+          height: 68,
+          paddingHorizontal: 6,
+          // Shadow
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.08,
-          shadowRadius: 12,
-          elevation: 8,
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.12,
+          shadowRadius: 20,
+          elevation: 12,
           borderTopWidth: 0,
           position: 'absolute',
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
-          marginTop: 2,
+          // Subtle border
+          borderWidth: 1,
+          borderColor: C.border,
         },
       }}
     >
-      <Tabs.Screen
-        name="(home)/index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ focused }) => (
-            <View style={[
-              styles.iconWrap,
-              { backgroundColor: focused ? C.tabActive : 'transparent' },
-            ]}>
-              <IconSymbol
-                size={22}
-                name="square.grid.2x2.fill"
-                color={focused ? C.textInverse : C.tabInactive}
-              />
-            </View>
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="(card)/index"
-        options={{
-          title: 'Account',
-          tabBarIcon: ({ focused }) => (
-            <View style={[
-              styles.iconWrap,
-              { backgroundColor: focused ? C.tabActive : 'transparent' },
-            ]}>
-              <IconSymbol
-                size={22}
-                name="person"
-                color={focused ? C.textInverse : C.tabInactive}
-              />
-            </View>
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="(community)/index"
-        options={{
-          title: 'Community',
-          tabBarIcon: ({ focused }) => (
-            <View style={[
-              styles.iconWrap,
-              { backgroundColor: focused ? C.tabActive : 'transparent' },
-            ]}>
-              <IconSymbol
-                size={22}
-                name="calendar"
-                color={focused ? C.textInverse : C.tabInactive}
-              />
-            </View>
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="(learn)/index"
-        options={{
-          title: 'Learn',
-          tabBarIcon: ({ focused }) => (
-            <View style={[
-              styles.iconWrap,
-              { backgroundColor: focused ? C.tabActive : 'transparent' },
-            ]}>
-              <IconSymbol
-                size={22}
-                name="desktopcomputer"
-                color={focused ? C.textInverse : C.tabInactive}
-              />
-            </View>
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="(more)"
-        options={{
-          title: 'More',
-          tabBarIcon: ({ focused }) => (
-            <View style={[
-              styles.iconWrap,
-              { backgroundColor: focused ? C.tabActive : 'transparent' },
-            ]}>
-              <IconSymbol
-                size={22}
-                name="clock"
-                color={focused ? C.textInverse : C.tabInactive}
-              />
-            </View>
-          ),
-        }}
-      />
+      {TABS.map(({ name, label, icon }) => (
+        <Tabs.Screen
+          key={name}
+          name={name}
+          options={{
+            title: label,
+            tabBarIcon: ({ focused }) => (
+              <TabItem focused={focused} icon={icon} label={label} />
+            ),
+          }}
+        />
+      ))}
     </Tabs>
   );
 }
 
 const styles = StyleSheet.create({
-  iconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+  item: {
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 3,
+    paddingTop: 35,
+    minWidth: 56,
+  },
+
+  pill: {
+    width: 44,
+    height: 40,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  label: {
+    fontSize: 10,
+    letterSpacing: 0.2,
+    lineHeight: 13,
+  },
+
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    marginTop: 1,
   },
 });
