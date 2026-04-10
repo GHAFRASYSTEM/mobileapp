@@ -1,0 +1,8 @@
+//ios build
+npx eas-cli@latest build --platform ios --profile production
+
+//android build
+npx eas-cli@latest build --platform android --profile production
+
+//update
+npx eas-cli@latest update --branch production --message "update" --platform ios

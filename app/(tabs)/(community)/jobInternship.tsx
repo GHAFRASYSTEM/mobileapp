@@ -1,11 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import UpcomingScreen from '@/components/Screens/UpcomingScreen'
 
 const jobInternship = () => {
   return (
-    <View>
-      <Text>jobInternship</Text>
-    </View>
+    <UpcomingScreen
+      title="Job & Internship"
+      message="We're working on a better way for you to find job and internship opportunities."
+    />
   )
 }
 

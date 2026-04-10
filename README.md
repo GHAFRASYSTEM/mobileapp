@@ -11,10 +11,16 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    ```
 
 2. Start the app
-
-   ```bash
    npx expo start
-   ```
+
+Success:  4242 4242 4242 4242  — any future date — any CVV
+Decline:  4000 0000 0000 0002
+3D Secure: 4000 0025 0000 3155
+
+npx expo prebuild --clean
+🚀 Step 4 — Run app
+npx expo run:ios
+npx expo run:ios --device
 
 In the output, you'll find options to open the app in a
 

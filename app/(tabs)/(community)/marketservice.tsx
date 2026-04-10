@@ -1,11 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import UpcomingScreen from '@/components/Screens/UpcomingScreen'
 
 const marketservice = () => {
   return (
-    <View>
-      <Text>marketservice</Text>
-    </View>
+    <UpcomingScreen
+      title="Market Service"
+      message="We're working on a better way for you to access our market services."
+    />
   )
 }
 

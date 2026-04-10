@@ -1,121 +1,129 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, StatusBar,
-  KeyboardAvoidingView, Platform, TouchableOpacity,
+  View, Text, StyleSheet, TouchableOpacity,
+  ScrollView, ActivityIndicator,
 } from 'react-native';
+import { useRouter }        from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { useColors } from '@/constants/Colors';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import ScreenHeader from '@/components/Headers/ScreenHeader';
-import DuesSummaryCard from '@/components/Cards/DuesSummaryCard';
-import PrimaryButton from '@/components/Buttons/PrimaryButton';
-import CardPaymentForm from '@/components/Payments/CardPaymentForm';
-import MomoPayment from '@/components/Payments/MomoPayment';
+import { useColors }        from '@/constants/Colors';
+import { api }              from '@/services/api';
+import { usePayDues } from '@/hooks/dues/usePayDues';
+import ScreenHeader         from '@/components/Headers/ScreenHeader';
+import { IconSymbol }       from '@/components/ui/icon-symbol';
 
-type PayMethod = 'card' | 'momo';
+type DuesStatus = {
+  paid:     boolean;
+  label:    string;
+  amount:   number;
+  currency: string;
+  month:    number;
+  year:     number;
+  payment:  any;
+};
 
-// ─── Derive current dues from today's date ────────────────────────────────────
-function getCurrentDues() {
-  const now = new Date();
-  const monthName = now.toLocaleString('en-GB', { month: 'long' });
-  const year = now.getFullYear();
-  return {
-    label: `${monthName} Dues ${year}`,
-    period: `${monthName} ${year}`,
-    month: now.getMonth(),   // 0-indexed
-    year,
-    amount: 10.00,           // monthly dues amount
-    currency: 'EUR',
-  };
-}
-
-// ─── Replace with real API call ───────────────────────────────────────────────
-async function fetchPaymentStatus(month: number, year: number): Promise<boolean> {
-  // Return true if user has already paid for this month
-  // e.g. await api.get(`/dues/status?month=${month}&year=${year}`)
-  return true; // mock: not paid
-}
-// ─────────────────────────────────────────────────────────────────────────────
+type Method = 'card' | 'momo';
 
 export default function PayDues() {
-  const C = useColors();
-  const insets = useSafeAreaInsets();
-  const router = useRouter();
+  const C       = useColors();
+  const insets  = useSafeAreaInsets();
+  const router  = useRouter();
 
-  const dues = getCurrentDues();
+  const [status,    setStatus]    = useState<DuesStatus | null>(null);
+  const [fetching,  setFetching]  = useState(true);
+  const [method,    setMethod]    = useState<Method>('card');
 
-  const [method, setMethod]   = useState<PayMethod>('card');
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState<string | null>(null);
+  const { pay, loading, error, success } = usePayDues();
 
-  // Replace this with a useEffect that calls fetchPaymentStatus
-  const [hasPaid] = useState(false);
+  // Load current dues status
+  useEffect(() => {
+    api.get<DuesStatus>('/dues/status')
+      .then(setStatus)
+      .catch(console.error)
+      .finally(() => setFetching(false));
+  }, []);
 
-  const nextMonth = new Date(dues.year, dues.month + 1, 1)
-    .toLocaleString('en-GB', { month: 'long', year: 'numeric' });
+  // Refresh status after successful payment
+  useEffect(() => {
+    if (!success) return;
+    api.get<DuesStatus>('/dues/status').then(setStatus);
+  }, [success]);
 
-  const handlePay = async () => {
-    setError(null);
-    setLoading(true);
-    try {
-      await new Promise(r => setTimeout(r, 2200));
-      router.push({
-        pathname: '/(account)/payment-success',
-        params: {
-          amount: dues.amount.toFixed(2),
-          currency: dues.currency,
-          period: dues.period,
-          method,
-        },
-      });
-    } catch {
-      setError('Payment failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (fetching) {
+    return (
+      <View style={[styles.root, { backgroundColor: C.background }]}>
+        <ScreenHeader title="Pay Dues" />
+        <ActivityIndicator style={{ flex: 1 }} color={C.primary} />
+      </View>
+    );
+  }
+
+  const nextMonth = status
+    ? new Date(status.year, status.month, 1)
+        .toLocaleString('en-GB', { month: 'long', year: 'numeric' })
+    : '';
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: C.background }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <StatusBar barStyle="light-content" backgroundColor={C.header} />
+    <View style={[styles.root, { backgroundColor: C.background }]}>
       <ScreenHeader title="Pay Dues" showBack />
-      <View style={[styles.goldBar, { backgroundColor: C.gold }]} />
 
       <ScrollView
         contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 40 }]}
         showsVerticalScrollIndicator={false}
       >
-        <DuesSummaryCard
-          amount={dues.amount}
-          currency={dues.currency}
-          label={dues.label}
-          period={dues.period}
-          paid={hasPaid}
-        />
+        {/* Summary card */}
+        <View style={[styles.summaryCard, {
+          backgroundColor: C.surface,
+          borderColor: status?.paid ? C.borderFocus : C.border,
+        }]}>
+          <View style={[styles.accent, {
+            backgroundColor: status?.paid ? C.primary : C.gold,
+          }]} />
+          <View style={styles.summaryBody}>
+            <View style={styles.summaryTop}>
+              <Text style={[styles.summaryLabel, { color: C.textMuted }]}>
+                {status?.paid ? 'PAID' : 'AMOUNT DUE'}
+              </Text>
+              {status?.paid && (
+                <View style={[styles.paidPill, { backgroundColor: C.primarySubtle }]}>
+                  <Text style={[styles.paidPillText, { color: C.primary }]}>✓ Paid</Text>
+                </View>
+              )}
+            </View>
+            <Text style={[styles.amount, {
+              color: status?.paid ? C.primary : C.textPrimary,
+            }]}>
+              {status?.currency} {status?.amount.toFixed(2)}
+            </Text>
+            <Text style={[styles.label, { color: C.textSecondary }]}>
+              {status?.label}
+            </Text>
+          </View>
+        </View>
 
-        {hasPaid ? (
-          /* ── Already paid banner ─────────────────────────────────── */
-          <View style={[styles.paidBanner, { backgroundColor: C.primarySubtle, borderColor: C.borderFocus }]}>
-            <IconSymbol name="checkmark.seal.fill" size={22} color={C.primary} />
-            <View style={{ flex: 1, gap: 2 }}>
+        {/* Already paid */}
+        {status?.paid ? (
+          <View style={[styles.paidBanner, {
+            backgroundColor: C.primarySubtle,
+            borderColor: C.borderFocus,
+          }]}>
+            <IconSymbol name="checkmark.seal.fill" size={24} color={C.primary} />
+            <View style={{ flex: 1, gap: 3 }}>
               <Text style={[styles.paidTitle, { color: C.textSuccess }]}>
-                All caught up for {dues.period}!
+                All caught up! 🎉
               </Text>
               <Text style={[styles.paidSub, { color: C.textSecondary }]}>
-                Your next dues will be due in {nextMonth}. Thank you for your continued support 🙏
+                Next dues due in {nextMonth}. Thank you for your support!
               </Text>
             </View>
           </View>
         ) : (
-          /* ── Payment form ────────────────────────────────────────── */
           <>
-            {/* Compact segmented tabs */}
-            <View style={[styles.tabs, { backgroundColor: C.surface, borderColor: C.border }]}>
-              {(['card', 'momo'] as PayMethod[]).map((m) => (
+            {/* Method selector */}
+            <View style={[styles.tabs, {
+              backgroundColor: C.surface,
+              borderColor: C.border,
+            }]}>
+              {(['card', 'momo'] as Method[]).map(m => (
                 <TouchableOpacity
                   key={m}
                   style={[styles.tab, method === m && { backgroundColor: C.primary }]}
@@ -127,58 +135,81 @@ export default function PayDues() {
                     size={13}
                     color={method === m ? '#fff' : C.textMuted}
                   />
-                  <Text style={[styles.tabText, { color: method === m ? '#fff' : C.textMuted }]}>
+                  <Text style={[styles.tabText, {
+                    color: method === m ? '#fff' : C.textMuted,
+                  }]}>
                     {m === 'card' ? 'Card' : 'Mobile Money'}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            {method === 'card' ? (
-              <>
-                <CardPaymentForm />
-                <PrimaryButton
-                  text={`Pay ${dues.currency} ${dues.amount.toFixed(2)}`}
-                  onPress={handlePay}
-                  loading={loading}
-                  icon="lock.fill"
-                />
-              </>
-            ) : (
-              <MomoPayment
-                amount={dues.amount}
-                currency={dues.currency}
-                onPay={handlePay}
-                loading={loading}
-              />
-            )}
-
+            {/* Error */}
             {error && (
-              <View style={[styles.errorCard, { backgroundColor: C.dangerSubtle, borderColor: C.borderDanger }]}>
+              <View style={[styles.errorCard, {
+                backgroundColor: C.dangerSubtle,
+                borderColor: C.borderDanger,
+              }]}>
                 <IconSymbol name="exclamationmark.circle.fill" size={16} color={C.danger} />
                 <Text style={[styles.errorText, { color: C.textDanger }]}>{error}</Text>
               </View>
             )}
+
+            {/* Pay button */}
+            <TouchableOpacity
+              style={[styles.payBtn, { backgroundColor: C.primary }]}
+              onPress={() => pay(method)}
+              disabled={loading}
+              activeOpacity={0.85}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <>
+                  <IconSymbol name="lock.fill" size={15} color="#fff" />
+                  <Text style={styles.payBtnText}>
+                    Pay {status?.currency} {status?.amount.toFixed(2)}
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
+
+            <Text style={[styles.secureNote, { color: C.textMuted }]}>
+              🔒 Secured by Stripe
+            </Text>
           </>
         )}
       </ScrollView>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  goldBar:    { height: 3 },
-  scroll:     { padding: 20, gap: 16 },
+  root:        { flex: 1 },
+  scroll:      { padding: 20, gap: 16 },
 
-  paidBanner: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, borderRadius: 14, borderWidth: 1, padding: 14 },
-  paidTitle:  { fontSize: 14, fontWeight: '700' },
-  paidSub:    { fontSize: 12, lineHeight: 18 },
+  summaryCard: { flexDirection: 'row', borderRadius: 16, borderWidth: 1, overflow: 'hidden' },
+  accent:      { width: 5 },
+  summaryBody: { flex: 1, padding: 14, gap: 4 },
+  summaryTop:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  summaryLabel:{ fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  paidPill:    { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 },
+  paidPillText:{ fontSize: 10, fontWeight: '700' },
+  amount:      { fontSize: 28, fontWeight: '800', letterSpacing: -0.5 },
+  label:       { fontSize: 13 },
 
-  // Compact pill-style segmented control
-  tabs:    { flexDirection: 'row', borderRadius: 10, borderWidth: 1, padding: 3, gap: 3 },
-  tab:     { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingVertical: 8, borderRadius: 8 },
-  tabText: { fontSize: 12, fontWeight: '600' },
+  paidBanner:  { flexDirection: 'row', alignItems: 'flex-start', gap: 12, borderRadius: 14, borderWidth: 1, padding: 14 },
+  paidTitle:   { fontSize: 14, fontWeight: '700' },
+  paidSub:     { fontSize: 12, lineHeight: 18 },
 
-  errorCard:  { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 12, borderWidth: 1 },
-  errorText:  { flex: 1, fontSize: 13, fontWeight: '500' },
+  tabs:        { flexDirection: 'row', borderRadius: 10, borderWidth: 1, padding: 3, gap: 3 },
+  tab:         { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingVertical: 8, borderRadius: 8 },
+  tabText:     { fontSize: 12, fontWeight: '600' },
+
+  errorCard:   { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 12, borderWidth: 1 },
+  errorText:   { flex: 1, fontSize: 13, fontWeight: '500' },
+
+  payBtn:      { borderRadius: 14, height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  payBtnText:  { fontSize: 16, fontWeight: '700', color: '#fff' },
+  secureNote:  { textAlign: 'center', fontSize: 12 },
 });

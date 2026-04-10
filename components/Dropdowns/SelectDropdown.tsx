@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import {
   View, Text, TouchableOpacity, Modal,
-  FlatList, TextInput, StyleSheet
+  FlatList, TextInput, StyleSheet,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useColors } from '@/constants/Colors';
 
 type Props = {
   label: string;
@@ -11,7 +12,6 @@ type Props = {
   placeholder: string;
   items: string[];
   onChange: (val: string) => void;
-  isDark: boolean;
   required?: boolean;
 };
 
@@ -21,81 +21,106 @@ export default function SelectDropdown({
   placeholder,
   items,
   onChange,
-  isDark,
   required,
 }: Props) {
-  const [visible, setVisible] = useState(false);
-  const [query, setQuery] = useState('');
+  const C      = useColors();
   const insets = useSafeAreaInsets();
 
-  const filtered = query
+  const [visible, setVisible] = useState(false);
+  const [query,   setQuery]   = useState('');
+
+  const filtered = query.trim()
     ? items.filter(i => i.toLowerCase().includes(query.toLowerCase()))
     : items;
 
-  const colors = {
-    label:       isDark ? '#aaa' : '#9A9890',
-    bg:          isDark ? '#1E1E1E' : '#fff',
-    border:      isDark ? '#333' : '#E8E6DF',
-    text:        isDark ? '#fff' : '#1A1A18',
-    placeholder: isDark ? '#555' : '#C0BEB8',
-    primary:     '#006B3F',
-    overlay:     'rgba(0,0,0,0.5)',
+  const handleSelect = (item: string) => {
+    onChange(item);
+    setVisible(false);
+    setQuery('');
+  };
+
+  const handleClose = () => {
+    setVisible(false);
+    setQuery('');
   };
 
   return (
     <>
-      {/* Select field */}
+      {/* ── Trigger field ─────────────────────────────────────────── */}
       <View style={styles.wrapper}>
-        <Text style={[styles.label, { color: colors.label }]}>
+        <Text style={[styles.label, { color: C.textMuted }]}>
           {label.toUpperCase()}
-          {required && <Text style={{ color: '#CE1126' }}> *</Text>}
+          {required && <Text style={{ color: C.danger }}> *</Text>}
         </Text>
 
         <TouchableOpacity
-          style={[styles.row, { backgroundColor: colors.bg, borderColor: colors.border }]}
+          style={[styles.row, { backgroundColor: C.surface, borderColor: C.border }]}
           onPress={() => setVisible(true)}
+          activeOpacity={0.8}
         >
-          <Text style={{ color: value ? colors.text : colors.placeholder }}>
+          <Text style={[styles.value, { color: value ? C.textPrimary : C.textMuted }]}>
             {value || placeholder}
           </Text>
+          <Text style={[styles.chevron, { color: C.textMuted }]}>›</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Modal */}
-      <Modal visible={visible} animationType="slide" transparent>
-        <View style={[styles.overlay, { backgroundColor: colors.overlay }]}>
-          <View style={[styles.sheet, { paddingBottom: insets.bottom + 12, backgroundColor: colors.bg }]}>
+      {/* ── Bottom sheet modal ────────────────────────────────────── */}
+      <Modal visible={visible} animationType="slide" transparent statusBarTranslucent>
+        <View style={styles.overlay}>
+          <TouchableOpacity style={styles.backdrop} onPress={handleClose} activeOpacity={1} />
 
-            <Text style={[styles.title, { color: colors.text }]}>{label}</Text>
+          <View style={[
+            styles.sheet,
+            { backgroundColor: C.surface, paddingBottom: insets.bottom + 16 },
+          ]}>
+            {/* Handle */}
+            <View style={[styles.handle, { backgroundColor: C.border }]} />
 
-            <TextInput
-              placeholder="Search..."
-              placeholderTextColor={colors.placeholder}
-              value={query}
-              onChangeText={setQuery}
-              style={[styles.search, { borderColor: colors.border, color: colors.text }]}
-            />
+            {/* Header */}
+            <View style={[styles.sheetHeader, { borderBottomColor: C.border }]}>
+              <Text style={[styles.sheetTitle, { color: C.textPrimary }]}>{label}</Text>
+              <TouchableOpacity onPress={handleClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Text style={[styles.doneText, { color: C.primary }]}>Done</Text>
+              </TouchableOpacity>
+            </View>
 
+            {/* Search */}
+            <View style={[styles.searchRow, { backgroundColor: C.background, borderColor: C.border }]}>
+              <Text style={[styles.searchIcon, { color: C.textMuted }]}>⌕</Text>
+              <TextInput
+                placeholder={`Search ${label.toLowerCase()}…`}
+                placeholderTextColor={C.textMuted}
+                value={query}
+                onChangeText={setQuery}
+                style={[styles.searchInput, { color: C.textPrimary }]}
+                autoCorrect={false}
+                clearButtonMode="while-editing"
+              />
+            </View>
+
+            {/* List */}
             <FlatList
               data={filtered}
-              keyExtractor={(i) => i}
+              keyExtractor={i => i}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              ListEmptyComponent={
+                <Text style={[styles.empty, { color: C.textMuted }]}>No results for "{query}"</Text>
+              }
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={styles.item}
-                  onPress={() => {
-                    onChange(item);
-                    setVisible(false);
-                    setQuery('');
-                  }}
+                  style={[styles.item, { borderBottomColor: C.border }]}
+                  onPress={() => handleSelect(item)}
+                  activeOpacity={0.7}
                 >
-                  <Text style={{ color: colors.text }}>{item}</Text>
+                  <Text style={[styles.itemText, { color: C.textPrimary }]}>{item}</Text>
+                  {item === value && (
+                    <Text style={[styles.checkmark, { color: C.primary }]}>✓</Text>
+                  )}
                 </TouchableOpacity>
               )}
             />
-
-            <TouchableOpacity onPress={() => setVisible(false)}>
-              <Text style={{ textAlign: 'center', color: colors.primary }}>Done</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -104,24 +129,27 @@ export default function SelectDropdown({
 }
 
 const styles = StyleSheet.create({
-  wrapper: { gap: 5 },
-  label: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
-  row: {
-    height: 48,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    justifyContent: 'center',
-    paddingHorizontal: 14,
-  },
-  overlay: { flex: 1, justifyContent: 'flex-end' },
-  sheet: { borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, maxHeight: '80%' },
-  title: { fontWeight: '700', fontSize: 16, marginBottom: 10 },
-  search: {
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    height: 40,
-    marginBottom: 10,
-  },
-  item: { paddingVertical: 12 },
+  wrapper:     { gap: 5 },
+  label:       { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  row:         { height: 48, borderRadius: 12, borderWidth: 1.5, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14 },
+  value:       { flex: 1, fontSize: 14 },
+  chevron:     { fontSize: 22, lineHeight: 26 },
+
+  overlay:     { flex: 1, justifyContent: 'flex-end' },
+  backdrop:    { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.45)' },
+  sheet:       { borderTopLeftRadius: 22, borderTopRightRadius: 22, overflow: 'hidden', maxHeight: '80%' },
+  handle:      { width: 36, height: 4, borderRadius: 2, alignSelf: 'center', marginTop: 10, marginBottom: 4 },
+
+  sheetHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: 1 },
+  sheetTitle:  { fontSize: 16, fontWeight: '700' },
+  doneText:    { fontSize: 14, fontWeight: '600' },
+
+  searchRow:   { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 16, marginVertical: 10, paddingHorizontal: 12, height: 42, borderRadius: 10, borderWidth: 1.5 },
+  searchIcon:  { fontSize: 18 },
+  searchInput: { flex: 1, fontSize: 14, height: '100%' },
+
+  item:        { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: 1 },
+  itemText:    { flex: 1, fontSize: 15 },
+  checkmark:   { fontSize: 16, fontWeight: '700' },
+  empty:       { textAlign: 'center', padding: 32, fontSize: 14 },
 });

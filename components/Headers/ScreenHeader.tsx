@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, StatusBar,
+  View, Text, TouchableOpacity, StyleSheet,
+  StatusBar, ImageBackground,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, Href } from 'expo-router';
@@ -10,30 +11,25 @@ import type { ComponentProps } from 'react';
 
 type IconName = ComponentProps<typeof IconSymbol>['name'];
 
-// ─── Nav variant props (your existing API — unchanged) ────────────────────────
 type NavProps = {
-  variant?:   'nav';
-  title:      string;
-  showBack?:  boolean;
-  right?:     React.ReactNode;
-  backRoute?: Href;
-  // page-only props not accepted here
-  subtitle?:  never;
-  icon?:      never;
+  variant?:     'nav';
+  title:        string;
+  showBack?:    boolean;
+  right?:       React.ReactNode;
+  backRoute?:   Href;
+  subtitle?:    never;
+  icon?:        never;
   onIconPress?: never;
 };
 
-// ─── Page variant props (new, used by tab screens) ────────────────────────────
 type PageProps = {
-  variant:    'page';
-  title:      string;
-  subtitle:   string;
-  icon:       IconName;
+  variant:      'page';
+  title:        string;
+  subtitle:     string;
+  icon:         IconName;
   onIconPress?: () => void;
-  // nav-only props not accepted here
-  showBack?: boolean;
-backRoute?: Href;
-
+  showBack?:    boolean;
+  backRoute?:   Href;
 };
 
 type Props = NavProps | PageProps;
@@ -53,50 +49,54 @@ export default function ScreenHeader(props: Props) {
     }
   };
 
+  const content = props.variant === 'page' ? (
+    <View style={[styles.pageHeader, { paddingTop: insets.top + 10 }]}>
+      {(props.showBack ?? false) && (
+        <TouchableOpacity onPress={handleBack} style={{ marginRight: 12 }}>
+          <IconSymbol name="chevron.left" size={20} color="#fff" />
+        </TouchableOpacity>
+      )}
+      <View style={styles.pageText}>
+        <Text style={styles.pageTitle}>{props.title}</Text>
+        <Text style={styles.pageSubtitle}>{props.subtitle}</Text>
+      </View>
+      <TouchableOpacity
+        style={[styles.iconBtn, { backgroundColor: 'rgba(255,255,255,0.18)' }]}
+        onPress={props.onIconPress}
+        disabled={!props.onIconPress}
+        activeOpacity={props.onIconPress ? 0.7 : 1}
+      >
+        <IconSymbol name={props.icon} size={20} color="#fff" />
+      </TouchableOpacity>
+    </View>
+  ) : (
+    <View style={[styles.navHeader, { paddingTop: insets.top + 8 }]}>
+      {(props.showBack ?? true) ? (
+        <TouchableOpacity onPress={handleBack} style={styles.side}>
+          <IconSymbol name="chevron.left" size={20} color="#fff" />
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.side} />
+      )}
+      <Text style={styles.navTitle} numberOfLines={1}>{props.title}</Text>
+      <View style={styles.side}>{props.right}</View>
+    </View>
+  );
+
   return (
     <>
-      <StatusBar barStyle="light-content" backgroundColor={C.header} />
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
-      {props.variant === 'page' ? (
-        // ── Page header: large title + subtitle + icon badge ──────────────
-<View style={[styles.pageHeader, { backgroundColor: C.header, paddingTop: insets.top + 10 }]}>
-  
-  {(props.showBack ?? true) && (
-    <TouchableOpacity onPress={handleBack} style={{ marginRight: 12 }}>
-      <IconSymbol name="chevron.left" size={20} color="#fff" />
-    </TouchableOpacity>
-  )}
-
-  <View style={styles.pageText}>
-    <Text style={styles.pageTitle}>{props.title}</Text>
-    <Text style={styles.pageSubtitle}>{props.subtitle}</Text>
-  </View>
-
-  <TouchableOpacity
-    style={[styles.iconBtn, { backgroundColor: 'rgba(255,255,255,0.15)' }]}
-    onPress={props.onIconPress}
-    disabled={!props.onIconPress}
-    activeOpacity={props.onIconPress ? 0.7 : 1}
-  >
-    <IconSymbol name={props.icon} size={20} color="#fff" />
-  </TouchableOpacity>
-</View>
-      ) : (
-        // ── Nav header: back button + centered title + right slot ─────────
-        <View style={[styles.navHeader, { backgroundColor: C.header, paddingTop: insets.top + 8 }]}>
-          {(props.showBack ?? true) ? (
-            <TouchableOpacity onPress={handleBack} style={styles.side}>
-              <IconSymbol name="chevron.left" size={20} color="#fff" />
-            </TouchableOpacity>
-          ) : (
-            <View style={styles.side} />
-          )}
-
-          <Text style={styles.navTitle} numberOfLines={1}>{props.title}</Text>
-
-          <View style={styles.side}>{props.right}</View>
-        </View>
-      )}
+      <ImageBackground
+        source={require('@/assets/images/kente.png')}
+        style={[styles.headerBg, { backgroundColor: C.header }]}
+        resizeMode="cover"
+        imageStyle={styles.kenteImage}
+      >
+        {/* Dark tint so text stays legible over the pattern */}
+        <View style={[styles.overlay, { backgroundColor: C.header }]} />
+        {content}
+      </ImageBackground>
 
       <View style={[styles.goldBar, { backgroundColor: C.gold }]} />
     </>
@@ -104,10 +104,23 @@ export default function ScreenHeader(props: Props) {
 }
 
 const styles = StyleSheet.create({
-  // ── Shared ──────────────────────────────────────────────────────────────
+  headerBg: {
+    overflow: 'hidden',
+  },
+
+  // Tint overlay — rgba so the kente pattern bleeds through subtly
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.82,
+  },
+
+  kenteImage: {
+    opacity: 0.35,   // how strongly the kente pattern shows — tune 0.2–0.5
+  },
+
   goldBar: { height: 3 },
 
-  // ── Nav variant ─────────────────────────────────────────────────────────
+  // ── Nav variant ──────────────────────────────────────────────────────────
   navHeader: {
     flexDirection:     'row',
     alignItems:        'center',

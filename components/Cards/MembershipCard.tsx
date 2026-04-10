@@ -13,6 +13,7 @@ type Props = {
   id: string;
   validUntil: string;
   region: string;
+  city?: string;
   memberSince: string;
   memberType?: string;
   picture?: string;
@@ -24,6 +25,7 @@ export default function MembershipCard({
   id,
   validUntil,
   region,
+  city,
   memberSince,
   memberType = 'Full Member',
   picture,
@@ -88,22 +90,31 @@ const isLight = scheme === 'light';
           <Text style={[styles.name, { color: C.cardText }]} numberOfLines={2}>{name}</Text>
           <Text style={[styles.id, { color: C.cardMeta }]}>{id}</Text>
 
-          <View style={styles.metaGrid}>
-            <View style={styles.metaRow}>
-              <View style={styles.metaItem}>
-                <Text style={[styles.metaLabel, { color: C.cardMeta }]}>REGION</Text>
-                <Text style={[styles.metaValue, { color: C.cardText }]}>{region}</Text>
-              </View>
-              <View style={styles.metaItem}>
-                <Text style={[styles.metaLabel, { color: C.cardMeta }]}>SINCE</Text>
-                <Text style={[styles.metaValue, { color: C.cardText }]}>{memberSince}</Text>
-              </View>
-            </View>
-            <View style={styles.metaItem}>
-              <Text style={[styles.metaLabel, { color: C.cardMeta }]}>VALID UNTIL</Text>
-              <Text style={[styles.metaValue, { color: C.cardText }]}>{validUntil}</Text>
-            </View>
-          </View>
+     <View style={styles.metaGrid}>
+      <View style={styles.metaRow}>
+        {/* City replaces region in the top-left slot */}
+        <View style={styles.metaItem}>
+          <Text style={[styles.metaLabel, { color: C.cardMeta }]}>CITY</Text>
+          <Text style={[styles.metaValue, { color: C.cardText }]}>{city}</Text>
+        </View>
+        <View style={styles.metaItem}>
+          <Text style={[styles.metaLabel, { color: C.cardMeta }]}>SINCE</Text>
+          <Text style={[styles.metaValue, { color: C.cardText }]}>{memberSince}</Text>
+        </View>
+      </View>
+
+      {/* Valid until + region side by side in the second row */}
+      <View style={styles.metaRow}>
+        <View style={styles.metaItem}>
+          <Text style={[styles.metaLabel, { color: C.cardMeta }]}>VALID UNTIL</Text>
+          <Text style={[styles.metaValue, { color: C.cardText }]}>{validUntil}</Text>
+        </View>
+        <View style={styles.metaItem}>
+          <Text style={[styles.metaLabel, { color: C.cardMeta }]}>REGION</Text>
+          <Text style={[styles.metaValue, { color: C.cardText }]}>{region}</Text>
+        </View>
+      </View>
+    </View>
         </View>
       </View>
 

@@ -7,31 +7,33 @@
     "icon": "./assets/images/icon.png",
     "scheme": "ghafra",
     "userInterfaceStyle": "automatic",
-
     "updates": {
-      "url": "https://u.expo.dev/ad5b2cab-1792-49b3-b6e9-77dac4878ce2"
+      "url": "https://u.expo.dev/ad5b2cab-1792-49b3-b6e9-77dac4878ce2",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
     },
-
     "runtimeVersion": {
       "policy": "appVersion"
     },
-
     "ios": {
+      "bundleIdentifier": "com.ghafra.ghafra",
       "supportsTablet": true,
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Allow GHAFRA to access your photos.",
         "NSCameraUsageDescription": "Allow GHAFRA to use your camera.",
-        "NSUserNotificationUsageDescription": "Allow GHAFRA to send you notifications."
+        "NSUserNotificationUsageDescription": "Allow GHAFRA to send you notifications.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
-
     "android": {
+      "package": "com.ghafra.ghafra",
       "predictiveBackGestureEnabled": false,
       "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "POST_NOTIFICATIONS"
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.RECORD_AUDIO"
       ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -39,15 +41,9 @@
         "monochromeImage": "./assets/images/icon.png"
       }
     },
-
-    "web": {
-      "output": "static",
-      "favicon": "./assets/images/icon.png"
-    },
-
     "plugins": [
       "expo-router",
-
+      "@react-native-google-signin/google-signin",
       [
         "expo-splash-screen",
         {
@@ -60,7 +56,6 @@
           }
         }
       ],
-
       [
         "expo-image-picker",
         {
@@ -68,28 +63,31 @@
           "cameraPermission": "Allow GHAFRA to use your camera."
         }
       ],
-
       [
         "expo-notifications",
         {
           "icon": "./assets/images/icon.png",
           "color": "#ffffff"
         }
+      ],
+      "expo-build-properties",
+      "expo-secure-store",
+      "@react-native-google-signin/google-signin",
+      [
+        "@stripe/stripe-react-native",
+        {}
       ]
     ],
-
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
     },
-
     "extra": {
       "router": {},
       "eas": {
         "projectId": "ad5b2cab-1792-49b3-b6e9-77dac4878ce2"
       }
     },
-
     "owner": "hostelhubb"
   }
 }

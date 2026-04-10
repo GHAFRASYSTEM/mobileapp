@@ -5,10 +5,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import AppHeader from '@/components/Headers/AppHeader';
 import MembershipCard from '@/components/Cards/MembershipCard';
 import { useRouter } from 'expo-router';
-
-export default function MyCardScreen() {
-  const C = useColors();
-  const router = useRouter();
+import { useProfile } from '@/context/AuthContext';
 
 type Route =
   | '/(account)/profile'
@@ -43,6 +40,25 @@ const actions: Action[] = [
   },
 ];
 
+export default function MyCardScreen() {
+  const C       = useColors();
+  const router  = useRouter();
+  const profile = useProfile();
+
+  const name        = profile?.name     ?? 'Member';
+  const memberId    = profile?.id       ? `GH-${profile.id.slice(0, 8).toUpperCase()}` : '—';
+  const city        = profile?.city     ?? '—';
+  const region      = profile?.region   ?? '—';
+  const photoUrl    = profile?.photo_url ?? undefined;
+
+  const memberSince = profile?.member_since
+    ? new Date(profile.member_since).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+    : '—';
+
+  const validUntil = profile?.member_since
+    ? `Dec ${new Date(profile.member_since).getFullYear() + 1}`
+    : '—';
+
   return (
     <View style={[styles.safe, { backgroundColor: C.background }]}>
       <AppHeader
@@ -51,41 +67,48 @@ const actions: Action[] = [
       />
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Membership Card */}
-        <MembershipCard
-          name="Kwame Asante"
-          id="GH-2024-00412"
-          validUntil="Dec 2025"
-          region="Greater Accra"
-          memberSince="January 2022"
-          picture="https://media.istockphoto.com/id/1377248437/photo/shot-of-a-mature-man-spending-time-by-himself-in-his-yard.jpg?s=612x612&w=0&k=20&c=7RQdVcef45S4-K6HJeh1RMHFSxiRBxCBnjADCO1PnHQ="
-          qrCode="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=GH-2024-00412"
-        />
+{profile?.is_verified === false ? (
+  <View style={[styles.verificationBanner, { backgroundColor: C.primarySubtle, borderColor: C.primary }]}>
+    <IconSymbol size={32} name="clock.badge.checkmark" color={C.primary} />
+    <Text style={[styles.verifyTitle, { color: C.textPrimary }]}>
+      Your card is under verification
+    </Text>
+    <Text style={[styles.verifySub, { color: C.textMuted }]}>
+      Our team is reviewing your membership. You'll receive access to your card once verified.
+    </Text>
+  </View>
+) : (
+  <MembershipCard
+    name={name}
+    id={memberId}
+    validUntil={validUntil}
+    city={city}
+    region={region}
+    memberSince={memberSince}
+    picture={photoUrl}
+    qrCode={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${memberId}`}
+  />
+)}
+
         <View style={{ height: 20 }} />
-        {/* Actions */}
-{actions.map((item) => (
-  <TouchableOpacity
-    key={item.label}
-    style={[styles.actionRow, { backgroundColor: C.surface, borderColor: C.border }]}
-    onPress={() => router.push(item.route)}
-    activeOpacity={0.7}
-  >
-    <View style={[styles.actionIcon, { backgroundColor: C.primarySubtle }]}>
-      <IconSymbol size={20} name={item.icon as any} color={C.primary} />
-    </View>
 
-    <View style={styles.actionText}>
-      <Text style={[styles.actionLabel, { color: C.textPrimary }]}>
-        {item.label}
-      </Text>
-      <Text style={[styles.actionSub, { color: C.textMuted }]}>
-        {item.sub}
-      </Text>
-    </View>
-
-    <IconSymbol size={16} name="chevron.right" color={C.textMuted} />
-  </TouchableOpacity>
-))}
+        {actions.map((item) => (
+          <TouchableOpacity
+            key={item.label}
+            style={[styles.actionRow, { backgroundColor: C.surface, borderColor: C.border }]}
+            onPress={() => router.push(item.route)}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.actionIcon, { backgroundColor: C.primarySubtle }]}>
+              <IconSymbol size={20} name={item.icon} color={C.primary} />
+            </View>
+            <View style={styles.actionText}>
+              <Text style={[styles.actionLabel, { color: C.textPrimary }]}>{item.label}</Text>
+              <Text style={[styles.actionSub,   { color: C.textMuted   }]}>{item.sub}</Text>
+            </View>
+            <IconSymbol size={16} name="chevron.right" color={C.textMuted} />
+          </TouchableOpacity>
+        ))}
 
         <View style={{ height: 100 }} />
       </ScrollView>
@@ -94,11 +117,29 @@ const actions: Action[] = [
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
-  scroll: { padding: 16 },
-  actionRow: { flexDirection: 'row', alignItems: 'center', padding: 14, borderRadius: 14, borderWidth: 1, marginBottom: 10, gap: 12 },
-  actionIcon: { width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  actionText: { flex: 1 },
+  safe:        { flex: 1 },
+  scroll:      { padding: 16 },
+  actionRow:   { flexDirection: 'row', alignItems: 'center', padding: 14, borderRadius: 14, borderWidth: 1, marginBottom: 10, gap: 12 },
+  actionIcon:  { width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  actionText:  { flex: 1 },
   actionLabel: { fontSize: 14, fontWeight: '600' },
-  actionSub: { fontSize: 12, marginTop: 1 },
+  actionSub:   { fontSize: 12, marginTop: 1 },
+  verificationBanner: {
+  borderRadius: 16,
+  borderWidth: 1,
+  padding: 28,
+  alignItems: 'center',
+  gap: 12,
+  marginBottom: 4,
+},
+verifyTitle: {
+  fontSize: 17,
+  fontWeight: '700',
+  textAlign: 'center',
+},
+verifySub: {
+  fontSize: 13,
+  textAlign: 'center',
+  lineHeight: 20,
+},
 });
