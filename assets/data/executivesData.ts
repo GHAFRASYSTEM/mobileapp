@@ -57,13 +57,13 @@ export const EXECUTIVES: Executive[] = [
   },
   {
     id:         '4',
-    name:       'Efua Darko',
+    name:       'Emmanuel Baidoo',
     role:       'Treasurer',
     department: 'Finance',
-    image:      require('@/assets/images/executives/treasurer.png'),
-    bio:        'Efua is a certified accountant who oversees GHAFRA\'s finances, dues collection, and budget reporting. She ensures full financial transparency and accountability to all members.',
+    image:      require('@/assets/images/executives/treasurer.jpeg'),
+    bio:        'Emmanuel oversees the association’s finances, ensuring transparency, accountability, and proper management of resources. His work supports effective operations and strengthens trust within the community.',
     email:      'ghafra.nord@gmail.com',
-    since:      '2022',
+    since:      '2024',
   },
   {
     id:         '6',
