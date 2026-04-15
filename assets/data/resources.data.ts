@@ -381,42 +381,261 @@ export const FRENCH_RESOURCES: FrenchResource[] = [
 },
 
 
-  {
-    id: 'comme-francaise',
-    title: 'Comme une Française',
-    description:
-      'Real conversational French with cultural notes. Videos include bilingual subtitles and cover everyday situations.',
-    levels: ['A2', 'B1', 'B2'],
-    format: 'video',
-    hasEnglishTranslation: true,
-    emoji: '🗼',
-    totalLessons: 2,
-    whatYouLearn: [
-      'Natural spoken French at conversational speed',
-      'Cultural context behind phrases and habits',
-      'Bilingual French / English subtitles',
-      'Vocabulary for real-life situations',
-    ],
-    studyTip: 'Focus on the flow of sentences, not individual words. At A2–B2 level, rhythm and intonation matter more than perfecting every word.',
-    lessons: [
-      {
-        videoId: 'REPLACE_ME',
-        title: 'How to Sound More French — Filler Words',
-        duration: '8:44',
-        level: 'B1',
-        topics: ['Alors', 'Bon', 'Bref', 'Quoi'],
-        englishSummary: 'The filler words native speakers use constantly — and how to use them naturally.',
-      },
-      {
-        videoId: 'REPLACE_ME',
-        title: 'French Politeness — What NOT to Say',
-        duration: '10:12',
-        level: 'A2',
-        topics: ['Vous vs Tu', 'Formal phrases', 'Common mistakes'],
-        englishSummary: 'Avoid the most common politeness mistakes English speakers make in French.',
-      },
-    ],
-  },
+{
+  id: 'superbook-fr-saison-1',
+  title: 'Superbook FR — Saison 1',
+  description:
+    'Chris, Aline et Gizmo sont propulsés dans les grandes histoires de la Bible dans cette série d\'animation chrétienne de qualité. Parfaite pour les enfants — et pour les adultes qui apprennent le français en famille.',
+  levels: ['A1', 'A2'],
+  format: 'video',
+  hasEnglishTranslation: false,
+  emoji: '📖',
+  totalLessons: 13,
+  whatYouLearn: [
+    'French storytelling vocabulary through Bible narratives',
+    'Natural spoken French at a child-friendly pace',
+    'Moral and emotional vocabulary in context',
+    'Characters\' conversations and reactions in everyday situations',
+  ],
+  studyTip:
+    "Watch each episode twice — first just to enjoy the story, then again to focus on words and phrases you can pick out. Pause and repeat sentences that the characters say to each other in the present-day scenes.",
+  lessons: [
+    {
+      videoId: '4-cneE5HunI',
+      title: 'Épisode 1 — L\'Univers en un mot !',
+      duration: '23:03',
+      level: 'A1',
+      topics: ['La Création', 'Adam et Ève', 'Lucifer'],
+      englishSummary:
+        'Chris sneaks into his father\'s lab and nearly destroys a secret project. Superbook takes the trio to witness Lucifer\'s rebellion in heaven and the temptation of Adam and Eve in Eden.',
+    },
+    {
+      videoId: 'S47iKmHCaWg',
+      title: 'Épisode 2 — Le Grand Sacrifice !',
+      duration: '23:03',
+      level: 'A1',
+      topics: ['Abraham', 'Isaac', 'Le sacrifice', 'La foi'],
+      englishSummary:
+        'Chris feels guilty about keeping a new video game when a sick child has none. Superbook takes the trio to witness Abraham and Isaac face an extraordinary test of faith.',
+    },
+    {
+      videoId: 'LqYs_Xxc3hU',
+      title: 'Épisode 3 — Jumeaux, mais pas frères !',
+      duration: '23:03',
+      level: 'A1',
+      topics: ['Jacob et Ésaü', 'Le pardon', 'La réconciliation'],
+      englishSummary:
+        'After Aline accidentally breaks Gizmo, Chris refuses to forgive her. Superbook whisks them to the story of Jacob and Esau — twin brothers divided by rivalry who eventually reconcile.',
+    },
+    {
+      videoId: 'OsKiEV5kZyI',
+      title: 'Épisode 4 — Des murs en eau !',
+      duration: '23:03',
+      level: 'A1',
+      topics: ['Moïse', 'L\'Exode', 'La mer Rouge'],
+      englishSummary:
+        'The trio relives their favourite adventures until Superbook takes them to witness Moses leading the Israelites out of Egypt and parting the Red Sea.',
+    },
+    {
+      videoId: 'rwEoJmHGEfo',
+      title: 'Épisode 5 — Gravés à jamais !',
+      duration: '23:02',
+      level: 'A1',
+      topics: ['Les dix commandements', 'Moïse', 'Le mont Sinaï'],
+      englishSummary:
+        'Chris ignores campsite rules and gets into trouble. Superbook shows him Moses receiving God\'s commandments on Mount Sinai — rules designed to protect, not to restrict.',
+    },
+    {
+      videoId: 'Q-Ygyw0HCrs',
+      title: 'Épisode 6 — Un défi géant !',
+      duration: '23:03',
+      level: 'A1',
+      topics: ['David et Goliath', 'Le courage', 'La confiance en Dieu'],
+      englishSummary:
+        'Chris has stage fright before performing guitar. Superbook takes him to meet young David, who faces the giant Goliath armed only with faith and a slingshot.',
+    },
+    {
+      videoId: 'vhvzgVam9AE',
+      title: 'Épisode 7 — À table, les lions !',
+      duration: '23:01',
+      level: 'A2',
+      topics: ['Daniel', 'La fosse aux lions', 'La persévérance'],
+      englishSummary:
+        'Chris refuses to stand up to a bully until Superbook shows him Daniel, who faces the lions\' den rather than deny his faith in God.',
+    },
+    {
+      videoId: 'NKKvDQiyfSo',
+      title: 'Épisode 8 — L\'Étoile du Roi !',
+      duration: '23:03',
+      level: 'A2',
+      topics: ['La naissance de Jésus', 'Les mages', 'Noël'],
+      englishSummary:
+        'Chris dismisses the nativity scene as just another Christmas decoration. Superbook transports the trio to witness the true story of the first Christmas and the birth of Jesus.',
+    },
+    {
+      videoId: 'Kf_B1ujB5k8',
+      title: 'Épisode 9 — Superpuissant !',
+      duration: '23:03',
+      level: 'A2',
+      topics: ['Les miracles de Jésus', 'La guérison', 'La foi'],
+      englishSummary:
+        'The trio witnesses the miracles of Jesus — healing the sick, feeding the multitude, and walking on water — and learns about the power of faith.',
+    },
+    {
+      videoId: 'a4QE7twZEbM',
+      title: 'Épisode 10 — Un traître à table !',
+      duration: '23:03',
+      level: 'A2',
+      topics: ['La Cène', 'Judas', 'La trahison'],
+      englishSummary:
+        'Chris and the trio are brought to the Last Supper, where they witness Jesus\' final meal with his disciples and Judas\'s betrayal — a story about loyalty and sacrifice.',
+    },
+    {
+      videoId: 'pUEHbdp6ZRE',
+      title: 'Épisode 11 — Plus fort que la mort !',
+      duration: '23:03',
+      level: 'A2',
+      topics: ['La crucifixion', 'La résurrection', 'Jésus vivant'],
+      englishSummary:
+        'Chris defies his mother until Superbook shows him the suffering, death, and resurrection of Jesus — the most powerful story of all.',
+    },
+    {
+      videoId: 'ojboDJS7zN0',
+      title: 'Épisode 12 — Une deuxième chance !',
+      duration: '23:03',
+      level: 'A2',
+      topics: ['Saul de Tarse', 'La conversion', 'La transformation'],
+      englishSummary:
+        'When a young troublemaker enters Chris and Aline\'s lives, they refuse to believe he can change — until Superbook shows them the dramatic transformation of Saul into Paul.',
+    },
+    {
+      videoId: 'KoSjKeR3eGQ',
+      title: 'Épisode 13 — Apocalypse : La Bataille Finale !',
+      duration: '23:03',
+      level: 'A2',
+      topics: ['L\'Apocalypse', 'Le pardon', 'La fin des temps'],
+      englishSummary:
+        'Chris fears he can never be forgiven for a serious mistake. Superbook takes the trio to witness the Book of Revelation and the ultimate message that no one is beyond God\'s grace.',
+    },
+        {
+      videoId: 'pvRkmV3szEI',
+      title: 'Épisode 1 — Du ventre de la baleine !',
+      duration: '25:38',
+      level: 'A2',
+      topics: ['Jonas', 'L\'obéissance', 'Le pardon'],
+      englishSummary:
+        'Aline witnesses a classmate steal a bike and reports it, but the principal forgives the thief instead of punishing her. Puzzled by this grace, Superbook whisks the trio to the story of Jonah — a prophet who ran from God\'s call and found mercy inside a great fish.',
+    },
+    {
+      videoId: 'I4j8B5SyRVM',
+      title: 'Épisode 2 — Le traducteur de songes',
+      duration: '25:38',
+      level: 'A2',
+      topics: ['Joseph', 'Les rêves du pharaon', 'La confiance en Dieu'],
+      englishSummary:
+        'Chris feels overlooked and jealous when someone else gets the praise he expected. Superbook takes the trio to witness Joseph — sold into slavery by his own brothers — rise to become the interpreter of Pharaoh\'s dreams and saviour of a nation.',
+    },
+    {
+      videoId: 'MebbukSx_xI',
+      title: 'Épisode 3 — Du milieu de la fournaise !',
+      duration: '25:39',
+      level: 'A2',
+      topics: ['La fournaise ardente', 'Shadrach, Meshach et Abednego', 'La foi sous pression'],
+      englishSummary:
+        'Chris and Aline face intense peer pressure to go along with something they know is wrong. Superbook transports them to witness Shadrach, Meshach and Abednego refuse to bow to the king\'s golden idol — and walk unharmed through a blazing furnace.',
+    },
+    {
+      videoId: 'MMj3gGlB1OE',
+      title: 'Épisode 4 — Les espions chez Rahab',
+      duration: '25:38',
+      level: 'A2',
+      topics: ['Rahab', 'Josué', 'Les murs de Jéricho', 'Le courage'],
+      englishSummary:
+        'Chris must decide whether to help someone others have written off as untrustworthy. Superbook brings the trio to meet Rahab, a woman in Jericho who hides Israelite spies and finds her whole family saved when the walls of Jericho come crashing down.',
+    },
+    {
+      videoId: '_y-rxhRBvcY',
+      title: 'Épisode 5 — Esther : le courage d\'une reine !',
+      duration: '25:38',
+      level: 'A2',
+      topics: ['Esther', 'Le courage', 'La providence'],
+      englishSummary:
+        'Aline is terrified to speak up against an injustice at school, afraid of the consequences. Superbook sends the trio to the Persian palace, where Queen Esther risks her life to approach the king and save her entire people from destruction.',
+    },
+    {
+      videoId: 'nBJ4HD--6Xs',
+      title: 'Épisode 6 — Une voix dans le désert',
+      duration: '25:38',
+      level: 'B1',
+      topics: ['Jean-Baptiste', 'La repentance', 'Préparer le chemin'],
+      englishSummary:
+        'Chris is too proud to admit he was wrong and apologise. Superbook takes the trio to witness John the Baptist — a bold voice in the wilderness calling people to repent and prepare their hearts for the coming of Jesus.',
+    },
+    {
+      videoId: 'S1Llsf-j_r0',
+      title: 'Épisode 7 — Paul : un passager peu ordinaire !',
+      duration: '25:39',
+      level: 'B1',
+      topics: ['Paul', 'Le naufrage', 'La foi dans la tempête'],
+      englishSummary:
+        'Chris panics when things spiral out of control on a trip. Superbook transports the trio aboard a storm-tossed ship with the apostle Paul, who keeps faith and courage through shipwreck, trusting that God will bring everyone safely to shore.',
+    },
+    {
+      videoId: 'x168roJqa2w',
+      title: 'Épisode 8 — Une épreuve de taille !',
+      duration: '25:00',
+      level: 'B1',
+      topics: ['Job', 'La souffrance', 'La fidélité de Dieu'],
+      englishSummary:
+        'When everything seems to go wrong at once, Chris questions whether God really cares. Superbook brings the trio to witness Job — a righteous man who loses everything yet refuses to abandon his faith, and who ultimately sees God restore all that was taken.',
+    },
+    {
+      videoId: '28TpaU64uyA',
+      title: 'Épisode 9 — L\'arche, la colombe, et l\'arc-en-ciel',
+      duration: '25:39',
+      level: 'A2',
+      topics: ['Noé', 'Le déluge', 'La promesse de Dieu'],
+      englishSummary:
+        'Chris ignores repeated warnings and ends up in a dangerous situation. Superbook takes the trio back to Noah, who faithfully builds an ark despite ridicule, survives the great flood, and receives God\'s rainbow promise never to abandon his creation.',
+    },
+    {
+      videoId: 'RFofa10Ft0k',
+      title: 'Épisode 10 — Gédéon : le guerrier et la toison de laine',
+      duration: '25:38',
+      level: 'B1',
+      topics: ['Gédéon', 'Les Madianites', 'La confiance malgré les doutes'],
+      englishSummary:
+        'Aline is appointed to lead a difficult task and wants to give up before she starts. Superbook sends the trio to meet Gideon — a reluctant warrior who repeatedly questions God\'s call, yet leads a tiny army to victory over the Midianites through faith alone.',
+    },
+    {
+      videoId: 'IDLSKA5FVhg',
+      title: 'Épisode 11 — Et le coq chanta deux fois',
+      duration: '25:38',
+      level: 'B1',
+      topics: ['Pierre', 'Le reniement', 'La vraie amitié'],
+      englishSummary:
+        'Chris starts hanging out with the popular crowd and gradually ignores Aline. Superbook brings the trio to witness Peter deny Jesus three times before the rooster crows — a painful lesson about loyalty, failure, and the grace of a second chance.',
+    },
+    {
+      videoId: '2Ce1aHxWWb8',
+      title: 'Épisode 12 — Reviens, mon fils',
+      duration: '25:38',
+      level: 'A2',
+      topics: ['Le fils prodigue', 'La grâce', 'Le retour à Dieu'],
+      englishSummary:
+        'Chris worries that a troubled boy named Justin can never be forgiven by his father. Superbook takes the trio to hear Jesus tell the parable of the prodigal son — a story of a child who wastes everything yet is welcomed home with open arms and celebration.',
+    },
+    {
+      videoId: 'EV2KnTqgrdk',
+      title: 'Épisode 13 — Criez plus fort !',
+      duration: '25:39',
+      level: 'B1',
+      topics: ['Élie', 'Les prophètes de Baal', 'Le seul vrai Dieu'],
+      englishSummary:
+        'Chris becomes obsessed with a video game where players compete to become the most powerful god. Superbook brings the trio to Mount Carmel, where the prophet Elijah challenges 450 prophets of Baal to a dramatic showdown — proving that there is only one true God.',
+    },
+  ],
+},
 
   // ── Non-video resources ────────────────────────────────────────────────────
 

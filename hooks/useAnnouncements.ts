@@ -27,7 +27,6 @@ export function useAnnouncements() {
   '/announcements?page=1&limit=50',
 );
 
-console.log('Fetched announcements:', res);
 if (!cancelled) setData(res);
       } catch (err: any) {
         if (!cancelled) setError(err.message ?? 'Failed to load announcements.');

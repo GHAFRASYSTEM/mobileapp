@@ -23,6 +23,14 @@ type Section = {
 };
 
 const SECTIONS: Section[] = [
+{
+  label:    'Arrival Pickup',
+  sub:      'Get picked up when you arrive in France',
+  icon:     'car.fill',
+  route:    '/(tabs)/(community)/pickup',
+  accent:   '#E8F5EE',
+  accentTx: '#006B3F',
+},
   {
     label:    'Housing',
     sub:      'Find accommodation',
@@ -62,14 +70,6 @@ const SECTIONS: Section[] = [
     route:    '/(tabs)/(community)/marketservice',
     accent:   '#FFF8DC',
     accentTx: '#7A5500',
-  },
-  {
-    label:    'Volunteer',
-    sub:      'Sign up & give back',
-    icon:     'hands.sparkles.fill',
-    route:    '/(tabs)/(community)/volunteer',
-    accent:   '#E8F5EE',
-    accentTx: '#006B3F',
   },
 ];
 

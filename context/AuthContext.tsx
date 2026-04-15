@@ -98,7 +98,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ── Bootstrap ─────────────────────────────────────────────────────────────
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-         console.log('[BOOT] session:', JSON.stringify(data.session?.user?.email));
     
       if (data.session) {
         loadProfile();

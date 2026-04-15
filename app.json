@@ -17,6 +17,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.ghafra.ghafra",
+       "usesAppleSignIn": true,
       "supportsTablet": true,
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Allow GHAFRA to access your photos.",
@@ -44,6 +45,7 @@
     "plugins": [
       "expo-router",
       "@react-native-google-signin/google-signin",
+         "expo-apple-authentication",
       [
         "expo-splash-screen",
         {

@@ -11,7 +11,7 @@ const OCCUPATIONS: string[] = Array.from(
   new Set(OCCUPATION_MAP.map(([, canonical]) => canonical))
 ).sort();
 
-const GENDERS = ['Male', 'Female'];
+const GENDERS = ['Male', 'Female','Prefer Not To Say'];
 
 export type ProfileFormValues = {
   name:        string;
@@ -55,11 +55,11 @@ export default function ProfileFormSection({ values, email, onChange }: Props) {
         placeholder="Select gender…"
         items={GENDERS}
         onChange={v => onChange('gender', v)}
-        required
+        // required
       />
 
       {/* Email — read only */}
-      <View style={styles.fieldWrap}>
+      {/* <View style={styles.fieldWrap}>
         <Text style={[styles.fieldLabel, { color: C.textMuted }]}>EMAIL</Text>
         <View style={[styles.readOnlyRow, { backgroundColor: C.surface, borderColor: C.border }]}>
           <Text style={[styles.readOnlyText, { color: C.textSecondary }]} numberOfLines={1}>
@@ -69,11 +69,11 @@ export default function ProfileFormSection({ values, email, onChange }: Props) {
             <Text style={[styles.lockedText, { color: C.textMuted }]}>via Google</Text>
           </View>
         </View>
-      </View>
+      </View> */}
 
       {/* Phone numbers */}
       <View style={styles.phoneGroup}>
-        <Text style={[styles.groupLabel, { color: C.textMuted }]}>PHONE NUMBERS</Text>
+        <Text style={[styles.groupLabel, { color: C.textMuted }]}>PHONE NUMBERS (Optional)</Text>
 
         <PhoneInputRow
           flag="🇬🇭"
@@ -86,7 +86,7 @@ export default function ProfileFormSection({ values, email, onChange }: Props) {
             onChange('ghanaPhone', display);
             onChange('ghanaE164',  e164);
           }}
-          required
+          // required
         />
 
         <PhoneInputRow

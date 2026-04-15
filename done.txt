@@ -1,0 +1,21 @@
+## What We Built
+
+This is the payments feature for **GHAFRA** — a Ghanaian community association app based in France. Members can pay their monthly dues and make voluntary donations, all processed through Stripe.
+
+---
+
+### The Problem We Solved
+Previously members paid dues and donations which were untracked through bank accounts
+
+Presentation Text
+The GHAFRA Digital Membership Card
+The GHAFRA card is the official proof of membership for every registered member of the Ghanaian community in France. It confirms that a member is active, dues-paying, and recognised by the association. Officials at events, meetings, and welfare activities use it to instantly identify and authenticate members without paperwork or manual lists.
+What makes this card different from a simple screenshot or PDF is the technology behind it. Each card carries a verification code that is generated using HMAC-SHA256 cryptography — the same standard used in banking security. The code is derived from the member's unique ID, a private secret known only to the server, and the current month and year. This means the code changes every month automatically. A screenshot from a previous month produces a code that fails verification instantly. Officials can visit ghafra.app/verify/CODE to confirm any card in seconds, with no login required.
+---
+
+### Stack
+- **Frontend** — React Native (Expo), TypeScript, Stripe React Native SDK
+- **Backend** — Node.js, Express, TypeScript, Stripe Node SDK
+- **Database** — PostgreSQL via Supabase
+- **Auth** — Supabase Auth with a custom `requireAuth` middleware
+

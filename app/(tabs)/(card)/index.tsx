@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState, useEffect} from 'react';
 import { View, ScrollView, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { useColors } from '@/constants/Colors';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -6,6 +6,7 @@ import AppHeader from '@/components/Headers/AppHeader';
 import MembershipCard from '@/components/Cards/MembershipCard';
 import { useRouter } from 'expo-router';
 import { useProfile } from '@/context/AuthContext';
+import { api } from '@/services/api';
 
 type Route =
   | '/(account)/profile'
@@ -26,24 +27,36 @@ const actions: Action[] = [
     sub: 'Update your information',
     route: '/(account)/profile',
   },
-  {
-    icon: 'creditcard.fill',
-    label: 'Pay Dues / Donations',
-    sub: 'Make a payment quickly to support GHAFRA',
-    route: '/(account)/paydues',
-  },
-  {
-    icon: 'list.bullet.rectangle.fill',
-    label: 'View Transactions',
-    sub: 'See your dues payment history',
-    route: '/(account)/transactions',
-  },
+
+  // Uncomment for OTA Update
+  // {
+  //   icon: 'creditcard.fill',
+  //   label: 'Pay Membership Dues ',
+  //   sub: 'Make a payment quickly to support GHAFRA',
+  //   route: '/(account)/paydues',
+  // },
+  // {
+  //   icon: 'list.bullet.rectangle.fill',
+  //   label: 'View Transactions',
+  //   sub: 'See your dues payment history',
+  //   route: '/(account)/transactions',
+  // },
 ];
 
 export default function MyCardScreen() {
   const C       = useColors();
   const router  = useRouter();
   const profile = useProfile();
+  const [verifyCode, setVerifyCode] = useState<string | null>(null);
+
+  useEffect(() => {
+  if (!profile?.is_verified) return;
+  api.get<{ code: string | null }>('/dues/my-code')
+    .then(res => setVerifyCode(res.code))
+    .catch(() => {}); 
+}, [profile?.is_verified]);
+
+console.log(verifyCode)
 
   const name        = profile?.name     ?? 'Member';
   const memberId    = profile?.id       ? `GH-${profile.id.slice(0, 8).toUpperCase()}` : '—';
@@ -86,7 +99,7 @@ export default function MyCardScreen() {
     region={region}
     memberSince={memberSince}
     picture={photoUrl}
-    qrCode={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${memberId}`}
+    verifyCode={verifyCode ?? undefined} 
   />
 )}
 

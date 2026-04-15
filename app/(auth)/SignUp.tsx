@@ -13,10 +13,20 @@ import AvatarPicker             from '@/components/ImagePickers/AvatarPicker';
 import ProfileFormSection       from '@/components/Sections/ProfileFormSection';
 import type { ProfileFormValues } from '@/components/Sections/ProfileFormSection';
 
-type GenderValue = 'male' | 'female';
+type GenderValue = 'male' | 'female' | "prefer_not_to_say";
 
-const toGenderValue = (label: string): GenderValue =>
-  label.toLowerCase() as GenderValue;
+const toGenderValue = (label: string): GenderValue => {
+  switch (label.toLowerCase()) {
+    case 'male':
+      return 'male';
+    case 'female':
+      return 'female';
+    case 'prefer not to say':
+      return 'prefer_not_to_say';
+    default:
+      return 'prefer_not_to_say';
+  }
+};
 
 const INITIAL: ProfileFormValues = {
   name:        '',
@@ -61,8 +71,8 @@ export default function SignUpScreen() {
 
   const isValid =
     form.name.trim().length > 0 &&
-    form.gender.length > 0      &&
-    form.ghanaE164.length > 0   &&
+    // form.gender.length > 0      &&
+    // form.ghanaE164.length > 0   &&
     form.city.length > 0        &&
     form.occupation.length > 0;
 
@@ -77,9 +87,12 @@ export default function SignUpScreen() {
 
       await api.post('/auth/complete-profile', {
         name:         form.name,
-        gender:       toGenderValue(form.gender),
-        ghana_phone:  form.ghanaE164,
-        french_phone: form.frenchE164 || undefined,
+        // gender:       toGenderValue(form.gender),
+        // ghana_phone:  form.ghanaE164,
+        gender:       form.gender ? toGenderValue(form.gender) : "prefer_not_to_say",
+        ghana_phone:  form.ghanaE164 || "0000000000",
+        
+        french_phone: form.frenchE164 || "0000000000",
         city:         form.city,
         occupation:   form.occupation,
         photo_url:    photoUri || undefined,

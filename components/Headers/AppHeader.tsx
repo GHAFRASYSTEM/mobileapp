@@ -43,7 +43,6 @@ export default function AppHeader({
   const insets  = useSafeAreaInsets();
   const router  = useRouter();
   const profile = useProfile();
-  console.log('Profile in header:', profile);
 
   const firstName    = profile?.name?.split(' ')[1] ?? 'Member';
   const initials     = profile?.name

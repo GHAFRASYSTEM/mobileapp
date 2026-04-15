@@ -9,6 +9,7 @@ import { DonationTab } from '@/components/Tabs/DonationTab';
 type Tab = 'dues' | 'donate';
 
 const TABS: { key: Tab; label: string }[] = [
+ 
   { key: 'dues',   label: 'Monthly Dues' },
   { key: 'donate', label: 'Donate'       },
 ];

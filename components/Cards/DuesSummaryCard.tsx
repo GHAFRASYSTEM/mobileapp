@@ -24,7 +24,7 @@ export function DuesSummaryCard({ paid, amount, currency, label }: Props) {
       <View style={styles.body}>
         <View style={styles.top}>
           <Text style={[styles.statusLabel, { color: C.textMuted }]}>
-            {paid ? 'PAID' : 'AMOUNT DUE'}
+            {paid ? 'MEMBERSHIP ACTIVE' : 'MEMBERSHIP FEE'}
           </Text>
           {paid && (
             <View style={[styles.pill, { backgroundColor: C.primarySubtle }]}>
@@ -36,6 +36,9 @@ export function DuesSummaryCard({ paid, amount, currency, label }: Props) {
           {currency} {amount.toFixed(2)}
         </Text>
         <Text style={[styles.label, { color: C.textSecondary }]}>{label}</Text>
+        <Text style={{ fontSize: 11, color: C.textMuted }}>
+  Monthly membership fee for registered GHAFRA association members (offline membership)
+</Text>
       </View>
     </View>
   );

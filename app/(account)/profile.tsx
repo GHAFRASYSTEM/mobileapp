@@ -30,7 +30,7 @@ export default function ProfileScreen() {
 
   const personalFields: Field[] = [
     { label: 'Full name',   value: profile.name         },
-    { label: 'Email',       value: profile.email        },
+    // { label: 'Email',       value: profile.email        },
     { label: 'Gender',      value: profile.gender       },
     { label: 'Occupation',  value: profile.occupation   },
     { label: 'City',        value: profile.city         },
@@ -49,12 +49,31 @@ export default function ProfileScreen() {
     { label: 'Member since', value: memberSince          },
   ];
 
+  const formatValue = (label: string, value: string | null | undefined) => {
+  if (!value) return '—';
+
+  // Gender condition
+  if (label === 'Gender' && value === 'prefer_not_to_say') {
+    return 'N/A';
+  }
+
+  // Phone conditions
+  if (
+    (label === 'Ghana phone' || label === 'French phone') &&
+    value === '0000000000'
+  ) {
+    return 'N/A';
+  }
+
+  return value;
+};
+
   const renderField = (f: Field, i: number, arr: Field[]) => (
     <View key={f.label}>
       <View style={styles.fieldRow}>
         <Text style={[styles.fieldLabel, { color: C.textMuted }]}>{f.label}</Text>
         <Text style={[styles.fieldValue, { color: f.value ? C.textPrimary : C.textMuted }]}>
-          {f.value ?? '—'}
+         {formatValue(f.label, f.value)}
         </Text>
       </View>
       {i < arr.length - 1 && <View style={[styles.divider, { backgroundColor: C.border }]} />}
@@ -79,7 +98,6 @@ export default function ProfileScreen() {
             </View>
           )}
           <Text style={[styles.heroName, { color: C.textPrimary }]}>{profile.name}</Text>
-          <Text style={[styles.heroSub,  { color: C.textMuted   }]}>{profile.email}</Text>
 
           <View style={[styles.memberBadge, { backgroundColor: C.primarySubtle }]}>
             <View style={[styles.dot, { backgroundColor: C.primary }]} />
@@ -90,7 +108,7 @@ export default function ProfileScreen() {
         </View>
 
         {/* Read-only notice */}
-        <View style={[styles.notice, { backgroundColor: C.border ?? C.primarySubtle, borderColor: C.borderInfo ?? C.border }]}>
+        <View style={[styles.notice, { backgroundColor: C.border ?? C.primarySubtle, borderColor: C.background ?? C.border }]}>
           <IconSymbol name="lock.fill" size={14} color={C.primary} />
           <Text style={[styles.noticeText, { color: C.textPrimary }]}>
             For equity reasons, profile details can only be updated by GHAFRA executives.

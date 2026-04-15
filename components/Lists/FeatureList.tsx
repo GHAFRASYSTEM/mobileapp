@@ -4,7 +4,6 @@ import { useColors } from '@/constants/Colors';
 
 const FEATURES = [
   { icon: '🪪', text: 'Digital membership card, always in your pocket', color: '#006B3F' },
-  { icon: '🤝', text: 'Connect with the Ghanaian community in France',   color: '#002395' },
   { icon: '🆘', text: 'Get help with accommodation, job search, and more', color: '#8B008B' },
 ];
 

@@ -2,7 +2,8 @@
 
 import { supabase } from '@/constants/supabase';
 
-const BASE_URL = 'https://backend-016i.onrender.com';
+const BASE_URL = 'https://8297-2001-861-64d0-f770-9c4-88a3-fa21-a3d1.ngrok-free.app'
+// 'https://backend-016i.onrender.com';
 
 async function getToken(): Promise<string | null> {
   try {
