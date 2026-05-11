@@ -2,7 +2,7 @@
   "expo": {
     "name": "ghafra",
     "slug": "ghafra",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "ghafra",
@@ -17,12 +17,11 @@
     },
     "ios": {
       "bundleIdentifier": "com.ghafra.ghafra",
-       "usesAppleSignIn": true,
+      "usesAppleSignIn": true,
       "supportsTablet": true,
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Allow GHAFRA to access your photos.",
-        "NSCameraUsageDescription": "Allow GHAFRA to use your camera.",
         "NSUserNotificationUsageDescription": "Allow GHAFRA to send you notifications.",
+        "NSMicrophoneUsageDescription": "Allow GHAFRA to access your microphone for voice recording and pronunciation practice for french practice.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -45,7 +44,7 @@
     "plugins": [
       "expo-router",
       "@react-native-google-signin/google-signin",
-         "expo-apple-authentication",
+      "expo-apple-authentication",
       [
         "expo-splash-screen",
         {
@@ -74,10 +73,16 @@
       ],
       "expo-build-properties",
       "expo-secure-store",
-      "@react-native-google-signin/google-signin",
       [
         "@stripe/stripe-react-native",
         {}
+      ],
+      // Recommended: Add expo-av plugin for better microphone control
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow GHAFRA to access your microphone for voice recording and pronunciation practice."
+        }
       ]
     ],
     "experiments": {

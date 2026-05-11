@@ -7,6 +7,7 @@ export default function MoreLayout() {
       <Stack.Screen name="aboutus"    options={{ headerShown: false }} />
       <Stack.Screen name="executives" options={{ headerShown: false }} />
       <Stack.Screen name="contact"    options={{ headerShown: false }} />
+      <Stack.Screen name="engineers"    options={{ headerShown: false }} />
       <Stack.Screen name="preference" options={{ headerShown: false }} />
     </Stack>
   );

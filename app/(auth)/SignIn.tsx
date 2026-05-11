@@ -67,7 +67,7 @@ export default function SignInScreen() {
         >
           <View style={styles.spacer} />
 
-          {/* ── Social sign-in (Google first) ── */}
+          {/* ── Social sign-in (Google first) ──  OTA UPDATE */}
           <Animated.View
             style={[
               styles.socialSection,

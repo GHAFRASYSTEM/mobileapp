@@ -19,6 +19,26 @@ type Props = {
   isExpired?: boolean;
 };
 
+function formatMembershipId(supabaseId: string, city?: string): string {
+  // Remove everything except numbers (0-9)
+  const digitsOnly = supabaseId.replace(/[^0-9]/g, '');
+
+  // Take the first 8 digits
+  const eightDigits = digitsOnly.slice(0, 8).padEnd(8, '0'); // pad with zeros if somehow less than 8
+
+  // Split into two groups of 4
+  const part1 = eightDigits.slice(0, 4);
+  const part2 = eightDigits.slice(4, 8);
+
+  // City code (first two letters, fallback to --)
+  const cityCode = (city || '--').slice(0, 2).toUpperCase().padEnd(2, '-');
+
+  return `FR - ${part1} - ${part2} - ${cityCode}`;
+}
+
+
+
+
 function MicroText({ text, color }: { text: string; color: string }) {
   const repeated = Array(30).fill(text).join('  ·  ');
   return (
@@ -113,7 +133,6 @@ export default function MembershipCard({
   region,
   city,
   memberSince,
-  memberType = 'Full Member',
   picture,
   verifyCode,
   isExpired = false,
@@ -138,7 +157,7 @@ export default function MembershipCard({
       {/* ── Security layer 3: Coat of arms watermark ── */}
       <Image
         source={require('@/assets/images/coatofarm.png')}
-        style={[styles.watermark, { opacity: isLight ? 0.06 : 0.035 }]}
+        style={[styles.watermark, { opacity: isLight ? 0.2 : 0.035 }]}
         resizeMode="contain"
       />
 
@@ -209,9 +228,6 @@ export default function MembershipCard({
             </View>
           )}
 
-          <View style={[styles.memberTypePill, { backgroundColor: C.cardStripe + '20' }]}>
-            <Text style={[styles.memberTypeText, { color: C.cardStripe }]}>{memberType}</Text>
-          </View>
 
           <View style={[
             styles.validBadge,
@@ -228,7 +244,7 @@ export default function MembershipCard({
           {/* Name sits at the very top, aligned with the photo */}
           <Text style={[styles.name, { color: C.cardText }]} numberOfLines={2}>{name}</Text>
           <Text style={[styles.id, { color: C.cardMeta }]}>
-            {id.match(/.{1,4}/g)?.join(' ') ?? id}
+            {formatMembershipId(id, city)}
           </Text>
 
           {/* Details and QR sit side by side below the name */}
@@ -259,7 +275,7 @@ export default function MembershipCard({
                   </Text>
                 </View>
                 <View style={styles.metaItem}>
-                  <Text style={[styles.metaLabel, { color: C.cardMeta }]}>REGION</Text>
+                  <Text style={[styles.metaLabel, { color: C.cardMeta }]}>GROUP</Text>
                   <Text style={[styles.metaValue, { color: C.cardText }]}>{region}</Text>
                 </View>
               </View>

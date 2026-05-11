@@ -153,7 +153,7 @@ function PulsingDots({ color }: { color: string }) {
 
 const styles = StyleSheet.create({
   root:    { flex: 1 },
-  overlay: { ...StyleSheet.absoluteFillObject, opacity: 0.78 },
+  overlay: { ...StyleSheet.absoluteFillObject, opacity: 0.68 },
   content: { flex: 1, alignItems: 'center', gap: 10 },
 
   logoBadge: {

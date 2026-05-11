@@ -4,33 +4,31 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useColors } from '@/constants/Colors';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import AppHeader from '@/components/Headers/AppHeader';
 import { useAuth } from '@/context/AuthContext';
 import SignOutDeleteButtons from '@/components/Buttons/SignOutDeleteButtons';
-import type { ComponentProps } from 'react';
 
-type IconName = ComponentProps<typeof IconSymbol>['name'];
+type IconName = React.ComponentProps<typeof MaterialIcons>['name'];
 
 type MenuItem = {
-  icon:    IconName;
-  label:   string;
-  sub:     string;
-  route?:  string;
-  url?:    string;
+  icon:   IconName;
+  label:  string;
+  sub:    string;
+  route?: string;
+  url?:   string;
 };
 
 const SECTIONS: { title: string; items: MenuItem[] }[] = [
   {
     title: 'Membership',
     items: [
-      { icon: 'info.circle',         label: 'About GHAFRA',  sub: 'Learn about the association', route: '/(more)/aboutus'    },
-      { icon: 'person.2.circle',     label: 'Executives',    sub: 'GHAFRA leadership team',      route: '/(more)/executives' },
-      { icon: 'envelope.circle',     label: 'Contact Us',    sub: 'Reach the GHAFRA team',       route: '/(more)/contact'    },
-      { icon: 'questionmark.circle', label: 'Help Centre',   sub: 'FAQs and support',            url:   'https://ghafra.org/help'  },
-      { icon: 'doc.text',            label: 'Terms & Privacy', sub: 'Legal information',         url:   'https://ghafra.org/terms' },
-      { icon: 'bell',                label: 'Preferences',   sub: 'Manage alerts & language',    route: '/(more)/preference' },
+      { icon: 'info',            label: 'About GHAFRA', sub: 'Learn about the association', route: '/(more)/aboutus'    },
+      { icon: 'groups',          label: 'Executives',   sub: 'GHAFRA leadership team',      route: '/(more)/executives' },
+      { icon: 'code',        label: 'Development Team', sub: 'Meet the engineers behind our system', route: '/(more)/engineers' },
+      { icon: 'mail',            label: 'Contact Us',   sub: 'Reach the GHAFRA team',       route: '/(more)/contact'    },
+      { icon: 'notifications',   label: 'Preferences',  sub: 'Manage alerts & language',    route: '/(more)/preference' },
     ],
   },
 ];
@@ -56,7 +54,7 @@ export default function MoreScreen() {
   };
 
   const handleDeleteAccount = async () => {
-    
+
   };
 
   return (
@@ -84,7 +82,7 @@ export default function MoreScreen() {
               {profile?.email ?? ''}
             </Text>
           </View>
-          <IconSymbol size={16} name={'chevron.right' as IconName} color={C.textMuted} />
+          <MaterialIcons name="chevron-right" size={16} color={C.textMuted} />
         </TouchableOpacity>
 
         {/* Menu sections */}
@@ -102,15 +100,15 @@ export default function MoreScreen() {
                     activeOpacity={0.7}
                   >
                     <View style={[styles.menuIcon, { backgroundColor: C.primarySubtle }]}>
-                      <IconSymbol size={18} name={item.icon} color={C.primary} />
+                      <MaterialIcons name={item.icon} size={18} color={C.primary} />
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={[styles.menuLabel, { color: C.textPrimary }]}>{item.label}</Text>
                       <Text style={[styles.menuSub,   { color: C.textMuted   }]}>{item.sub}</Text>
                     </View>
-                    <IconSymbol
+                    <MaterialIcons
+                      name={item.url ? 'language' : 'chevron-right'}
                       size={15}
-                      name={(item.url ? 'globe' : 'chevron.right') as IconName}
                       color={C.textMuted}
                     />
                   </TouchableOpacity>
@@ -129,7 +127,6 @@ export default function MoreScreen() {
           onDeleteAccount={handleDeleteAccount}
         />
 
-        <Text style={[styles.version, { color: C.textMuted }]}>GHAFRA v1.0.0</Text>
         <View style={{ height: 100 }} />
       </ScrollView>
     </View>
@@ -152,5 +149,4 @@ const styles = StyleSheet.create({
   menuLabel:    { fontSize: 14, fontWeight: '600', marginBottom: 1 },
   menuSub:      { fontSize: 12 },
   divider:      { height: 1, marginLeft: 62 },
-  version:      { textAlign: 'center', fontSize: 12, marginBottom: 8 },
 });

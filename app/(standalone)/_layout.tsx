@@ -16,6 +16,10 @@ export default function StandaloneLayout() {
         name="frenchLesson/[id]"
         options={{ presentation: 'modal', headerShown: false }}
       />
+       <Stack.Screen
+        name="frenchAI/index"
+        options={{ presentation: 'modal', headerShown: false }}
+      />
     </Stack>
   );
 }

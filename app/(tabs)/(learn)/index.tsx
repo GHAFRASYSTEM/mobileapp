@@ -12,6 +12,8 @@ import { Level } from '@/types/french.types';
 import { FRENCH_RESOURCES } from '@/assets/data/resources.data';
 import LevelFilterBar from '@/components/French/LevelFilterBar';
 import ResourceCard from '@/components/French/ResourceCard';
+// ✅ NEW
+import VoiceOrb from '@/components/French/VoiceOrb';
 
 type FilterValue = 'All' | Level;
 
@@ -46,6 +48,7 @@ export default function LearnFrenchScreen() {
   };
 
   return (
+    // ✅ position: 'relative' so the VoiceOrb can be positioned absolutely inside
     <View style={[styles.root, { backgroundColor: C.background }]}>
       <StatusBar barStyle="light-content" backgroundColor={C.header} />
 
@@ -82,11 +85,14 @@ export default function LearnFrenchScreen() {
         {activeLevel !== 'All' ? ` for ${activeLevel}` : ''}
       </Text>
 
-      {/* Resource list */}
+      {/* Resource list — extra bottom padding so last card isn't hidden by orb */}
       <FlatList
         data={filtered}
         keyExtractor={r => r.id}
-        contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 32 }]}
+        contentContainerStyle={[
+          styles.list,
+          { paddingBottom: insets.bottom + 120 }, // ✅ space for VoiceOrb
+        ]}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyWrap}>
@@ -99,6 +105,15 @@ export default function LearnFrenchScreen() {
         renderItem={({ item }) => (
           <ResourceCard item={item} onPress={() => handlePress(item.id)} />
         )}
+      />
+
+      {/* ✅ AI Tutor floating orb */}
+      {/* OTA Update: Add VoiceOrb */}
+      <VoiceOrb 
+        style={{
+          bottom: insets.bottom + 104,   // ↑ adjust this to move it up/down
+          right:  24,                   // → adjust this to move it left/right
+        }}
       />
     </View>
   );

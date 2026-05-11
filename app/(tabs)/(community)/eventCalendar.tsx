@@ -12,11 +12,14 @@ import type { MeetingDay, SpecialMonth, MonthStatus } from '@/types/calendar';
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 const SPECIAL_MONTHS: Record<number, SpecialMonth> = {
-  0:  { theme: 'New Year',       emoji: '🎆', accent: '#002395', eventName: 'New Year Celebration'       },
-  1:  { theme: 'Month of Love',  emoji: '❤️',  accent: '#CE1126', eventName: 'Valentine Social'           },
+  0:  { theme: 'VŒUX De GhaFra',       emoji: '🎆', accent: '#002395', eventName: 'New Year Celebration' },
+  1:  { theme: 'Month of Love',  emoji: '❤️', accent: '#CE1126', eventName: 'Valentine Social' },
   2:  { theme: 'Ghana Month',    emoji: '🇬🇭', accent: '#006B3F', eventName: 'Ghana Independence Evening' },
-  8:  { theme: 'Welcome Season', emoji: '🤝',  accent: '#E5A000', eventName: 'Welcome & Rentrée'          },
-  11: { theme: 'Festive Season', emoji: '🎄', accent: '#CE1126', eventName: 'Christmas & Year-End Gala'  },
+  5:  { theme: 'Mid-Year Review & Fête De La Musique', emoji: '🎶', accent: '#E5A000', eventName: 'Mid-Year Cultural Fest' },
+  6:  { theme: 'France Month',   emoji: '🇫🇷', accent: '#0055A4', eventName: 'Bastille Celebration' },
+  8:  { theme: 'Welcome Season', emoji: '🤝', accent: '#000000', eventName: 'Welcome & Rentrée' },
+  9:  { theme: 'GhaFra Month',   emoji: '🌍', accent: '#16A085', eventName: 'Cultural Fusion Night' },
+  11: { theme: 'Festive Season', emoji: '🎄', accent: '#C0392B', eventName: 'Christmas & Year-End Gala' },
 };
 
 function lastSaturday(year: number, month: number): Date {

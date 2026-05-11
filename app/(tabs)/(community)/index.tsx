@@ -3,38 +3,31 @@ import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useColors } from '@/constants/Colors';
 import AppHeader from '@/components/Headers/AppHeader';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import type { SFSymbol } from 'expo-symbols';
 
 const { width } = Dimensions.get('window');
 const CARD_GAP = 12;
 const PADDING  = 16;
 const CARD_W   = (width - PADDING * 2 - CARD_GAP) / 2;
 
+type IconName = React.ComponentProps<typeof MaterialIcons>['name'];
+
 type Section = {
   label:    string;
   sub:      string;
-  icon:     SFSymbol;
+  icon:     IconName;
   route:    string;
-  accent:   string;          // icon background tint (always visible)
-  accentTx: string;          // icon colour
+  accent:   string;
+  accentTx: string;
 };
 
 const SECTIONS: Section[] = [
-{
-  label:    'Arrival Pickup',
-  sub:      'Get picked up when you arrive in France',
-  icon:     'car.fill',
-  route:    '/(tabs)/(community)/pickup',
-  accent:   '#E8F5EE',
-  accentTx: '#006B3F',
-},
   {
     label:    'Housing',
     sub:      'Find accommodation',
-    icon:     'house.fill',
+    icon:     'home',
     route:    '/(tabs)/(community)/housing',
     accent:   '#E8F5EE',
     accentTx: '#006B3F',
@@ -42,31 +35,43 @@ const SECTIONS: Section[] = [
   {
     label:    'Event Calendar',
     sub:      'Upcoming events',
-    icon:     'calendar',
+    icon:     'calendar-today',
     route:    '/(tabs)/(community)/eventCalendar',
     accent:   '#FFF8DC',
     accentTx: '#7A5500',
   },
+
   {
     label:    'Jobs & Internships',
-    sub:      'Career opportunities',
-    icon:     'briefcase.fill',
+    sub:      'Find jobs, internships, and career opportunities',
+    icon:     'work',
     route:    '/(tabs)/(community)/jobInternship',
     accent:   '#E6EEFF',
     accentTx: '#002395',
   },
   {
-    label:    'Gallery',
-    sub:      'Photos & memories',
-    icon:     'photo.on.rectangle.angled',
-    route:    '/(tabs)/(community)/gallery',
+    label:    'Tour & Explore',
+    sub:      'Discover cities, culture, and hidden gems',
+    icon:     'explore',
+    route:    '/(tabs)/(community)/tour',
+    accent:   '#E8F5EE',
+    accentTx: '#006B3F',
+  },
+
+  {
+    label:    'GhaFra Care',
+    sub:      'Support & assistance',
+    icon:     'favorite',
+    route:    '/(tabs)/(community)/ghafra_care',
     accent:   '#FDECEA',
     accentTx: '#A50D1E',
   },
+
+  // OTA Update
   {
     label:    'Market & Services',
     sub:      'Buy, sell & hire',
-    icon:     'storefront.fill',
+    icon:     'storefront',
     route:    '/(tabs)/(community)/marketservice',
     accent:   '#FFF8DC',
     accentTx: '#7A5500',
@@ -117,7 +122,7 @@ export default function CommunityScreen() {
               <View style={styles.cardBody}>
                 {/* Icon */}
                 <View style={[styles.iconWrap, { backgroundColor: s.accent }]}>
-                  <IconSymbol name={s.icon} size={24} color={s.accentTx} />
+                  <MaterialIcons name={s.icon} size={24} color={s.accentTx} />
                 </View>
 
                 {/* Text */}
@@ -138,7 +143,7 @@ export default function CommunityScreen() {
               {/* Arrow */}
               <View style={styles.arrowRow}>
                 <View style={[styles.arrowBadge, { backgroundColor: C.primarySubtle }]}>
-                  <IconSymbol name="arrow.right" size={12} color={C.primary} />
+                  <MaterialIcons name="arrow-forward" size={12} color={C.primary} />
                 </View>
               </View>
             </TouchableOpacity>
@@ -177,10 +182,10 @@ const styles = StyleSheet.create({
   },
 
   iconWrap: {
-    width:        48,
-    height:       48,
-    borderRadius: 14,
-    alignItems:   'center',
+    width:          48,
+    height:         48,
+    borderRadius:   14,
+    alignItems:     'center',
     justifyContent: 'center',
   },
 

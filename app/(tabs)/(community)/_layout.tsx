@@ -7,9 +7,10 @@ export default function CommunityLayout() {
       <Stack.Screen name='housing' options={{headerShown: false}}/>
       <Stack.Screen name='eventCalendar' options={{headerShown:false}}/>
       <Stack.Screen name='jobInternship' options={{headerShown:false}}/>
+      <Stack.Screen name='ghafra_care' options={{headerShown:false}}/>
       <Stack.Screen name='gallery' options={{headerShown:false}}/>
       <Stack.Screen name='marketservice' options={{headerShown:false}}/>
-      <Stack.Screen name='volunteer' options={{headerShown:false}}/>
+      <Stack.Screen name='tour' options={{headerShown:false}}/>
     </Stack>
   );
 }

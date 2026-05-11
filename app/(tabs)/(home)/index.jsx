@@ -20,7 +20,8 @@ function getUpcomingMeeting(year) {
 
 // ✅ Updated to Ionicons names
 const quickActions = [
-  { icon: 'card', label: 'Pay Dues', route: '/(account)/paydues' },
+  
+  { icon: 'card', label: 'My Account', route: '/(card)' },
   { icon: 'people', label: 'About Us', route: '/(tabs)/(more)/aboutus' },
   { icon: 'play', label: 'Learn', route: '/(tabs)/(learn)' },
   { icon: 'compass', label: 'Explore', route: '/(tabs)/(community)' },

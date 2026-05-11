@@ -7,7 +7,7 @@ import { useColors }  from '@/constants/Colors';
 import { usePayDues } from '@/hooks/dues/usePayDues';
 import { PayButton } from '../Buttons/PayButton';
 
-const PRESETS = [10, 20, 50, 100, 300, 500, 1000];
+const PRESETS = [10, 20, 50, 100];
 
 export function DonationTab() {
   const C = useColors();
@@ -41,8 +41,12 @@ export function DonationTab() {
             Support GHAFRA 🤝
           </Text>
           <Text style={[styles.infoSub, { color: C.textSecondary }]}>
-            Your donation helps fund community events, welfare, and initiatives.
-            Every contribution makes a difference.
+            Your generosity powers real change — from community events and cultural 
+            celebrations to supporting vulnerable members and feeding those in need. 
+            Every contribution, big or small, goes directly to the people who need it most.
+
+Open to all. Whether you're a GHAFRA member or simply someone who believes in giving back, 
+your support helps us serve anyone in need — no membership required, no boundaries.
           </Text>
         </View>
       </View>
