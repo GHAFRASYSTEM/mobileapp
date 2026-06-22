@@ -35,7 +35,6 @@ const DETAILS = [
   { label: 'Founded',       value: '20 August 2024'     },
   { label: 'Type',          value: 'Registered Non-profit association' },
   { label: 'Prefecture',    value: 'North, France'      },
-  { label: 'Registered at', value: 'Iris Formation'     },
 ];
 
 export default function AboutUsScreen() {

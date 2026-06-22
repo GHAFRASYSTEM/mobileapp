@@ -1,271 +1,307 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import {
-  View, Text, StyleSheet, Modal, TouchableOpacity,
-  Image, ScrollView, Animated, Linking, Dimensions,
+  Image,
+  Linking,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useColors } from '@/constants/Colors';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { getExecutiveAccent } from '@/utils/executiveAccent';
 import type { Executive } from '@/assets/data/executivesData';
-import type { ComponentProps } from 'react';
-
-type IconName = ComponentProps<typeof IconSymbol>['name'];
-const { height } = Dimensions.get('window');
+import type { useColors } from '@/constants/Colors';
+import { getExecutiveAccent } from '@/utils/executiveAccent';
 
 type Props = {
   executive: Executive | null;
-  onClose:   () => void;
+  visible: boolean;
+  onClose: () => void;
+  C: ReturnType<typeof useColors>;
 };
 
-function ContactRow({ icon, label, value, onPress, accent }: {
-  icon: IconName; label: string; value: string; onPress?: () => void; accent: string;
+function open(url?: string) {
+  if (url) Linking.openURL(url).catch(() => {});
+}
+
+/** Thin decorative divider with a centred label — mirrors EngineerModal */
+function SectionHeading({ label, C, accent }: {
+  label: string;
+  C: ReturnType<typeof useColors>;
+  accent: string;
 }) {
-  const C = useColors();
   return (
-    <TouchableOpacity
-      style={[styles.contactRow, { backgroundColor: C.surface, borderColor: C.border }]}
-      onPress={onPress}
-      disabled={!onPress}
-      activeOpacity={onPress ? 0.75 : 1}
-    >
-      <View style={[styles.contactIcon, { backgroundColor: accent + '18' }]}>
-        <IconSymbol name={icon} size={15} color={accent} />
-      </View>
-      <View style={styles.contactText}>
-        <Text style={[styles.contactLabel, { color: C.textMuted }]}>{label}</Text>
-        <Text style={[styles.contactValue, { color: C.textPrimary }]}>{value}</Text>
-      </View>
-      {onPress && <IconSymbol name="arrow.up.right" size={13} color={C.textMuted} />}
-    </TouchableOpacity>
+    <View style={headingStyles.row}>
+      <View style={[headingStyles.line, { backgroundColor: C.border }]} />
+      <Text style={[headingStyles.label, { color: accent }]}>{label}</Text>
+      <View style={[headingStyles.line, { backgroundColor: C.border }]} />
+    </View>
   );
 }
 
-export default function ExecutiveModal({ executive, onClose }: Props) {
-  const C      = useColors();
-  const insets = useSafeAreaInsets();
-  const slideY = useRef(new Animated.Value(height)).current;
-  const fadeIn = useRef(new Animated.Value(0)).current;
+const headingStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 28,
+    marginBottom: 14,
+    gap: 10,
+  },
+  line: { flex: 1, height: 1 },
+  label: {
+    fontSize: 11,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 1.4,
+  },
+});
 
-  useEffect(() => {
-    if (executive) {
-      Animated.parallel([
-        Animated.timing(fadeIn, {
-          toValue: 1, duration: 250,
-          useNativeDriver: true,
-        }),
-        Animated.spring(slideY, {
-          toValue: 0, damping: 22, stiffness: 200,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    } else {
-      slideY.setValue(height);
-      fadeIn.setValue(0);
-    }
-  }, [executive]);
-
-  const handleClose = () => {
-    Animated.parallel([
-      Animated.timing(fadeIn, {
-        toValue: 0, duration: 180,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideY, {
-        toValue: height, duration: 220,
-        useNativeDriver: true,
-      }),
-    ]).start(onClose);
-  };
-
+export default function ExecutiveModal({ executive, visible, onClose, C }: Props) {
   if (!executive) return null;
 
-  const accent       = getExecutiveAccent(executive.name);
+  const accent = getExecutiveAccent(executive.name);
   const isDarkAccent = accent === '#FCD116' || accent === '#FFFFFF';
   const textOnAccent = isDarkAccent ? '#1A1A18' : '#fff';
 
   return (
-    <Modal visible={!!executive} transparent animationType="none" statusBarTranslucent>
-      {/* Scrim */}
-      <Animated.View style={[styles.scrim, { opacity: fadeIn }]}>
-        <TouchableOpacity style={StyleSheet.absoluteFill} onPress={handleClose} />
-      </Animated.View>
-
-      {/* Sheet */}
-      <Animated.View
-        style={[
-          styles.sheet,
-          {
-            backgroundColor: C.background,
-            paddingBottom:   insets.bottom + 24,
-            transform:       [{ translateY: slideY }],
-          },
-        ]}
-      >
-        {/* Drag handle */}
-        <View style={[styles.handle, { backgroundColor: C.border }]} />
-
-        {/* Hero — mirrors card accent stripe logic */}
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+      onRequestClose={onClose}
+    >
+      <View style={[styles.root, { backgroundColor: C.background }]}>
+        {/* ── Hero ── */}
         <View style={[styles.hero, { backgroundColor: accent }]}>
-          {/* Ghana/France flag stripe */}
-          <View style={styles.flagBar}>
-            {['#CE1126', '#FCD116', '#006B3F', '#002395', '#CE1126'].map((c, i) => (
-              <View key={i} style={[styles.flagSeg, { backgroundColor: c }]} />
+          {/* Diagonal stripe pattern overlay */}
+          <View style={styles.heroPattern} pointerEvents="none">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <View
+                key={i}
+                style={[
+                  styles.diagonal,
+                  { left: i * 52 - 20, opacity: 0.06 },
+                ]}
+              />
             ))}
           </View>
 
-          <View style={styles.heroContent}>
-            {/* Photo ring — mirrors card photoRing border */}
-            <View style={[styles.heroPhotoRing, { borderColor: `${textOnAccent}50` }]}>
-              <Image source={executive.image} style={styles.heroPhoto} resizeMode="cover" />
+          {/* Close pill */}
+          <Pressable style={styles.closeBtn} onPress={onClose} hitSlop={14}>
+            <View style={[styles.closePill, { backgroundColor: `${textOnAccent}30` }]}>
+              <Text style={[styles.closeTxt, { color: textOnAccent }]}>✕  Close</Text>
             </View>
+          </Pressable>
 
-            <View style={styles.heroText}>
-              <Text style={[styles.heroName, { color: textOnAccent }]}>
-                {executive.name}
-              </Text>
-
-              {/* Role pill — mirrors card rolePill */}
-              <View style={[styles.heroPill, { backgroundColor: `${textOnAccent}20` }]}>
-                <Text style={[styles.heroPillText, { color: textOnAccent }]}>
-                  {executive.role}
-                </Text>
-              </View>
-
-              <Text style={[styles.heroDept, { color: `${textOnAccent}B0` }]}>
-                {executive.department}
-                {executive.since ? `  ·  Since ${executive.since}` : ''}
-              </Text>
+          {/* Avatar */}
+          <View style={[styles.avatarOuter, { borderColor: textOnAccent }]}>
+            <View style={[styles.avatarInner, { borderColor: C.surface }]}>
+              <Image source={executive.image} style={styles.avatar} resizeMode="cover" />
             </View>
           </View>
 
-          {/* Close button */}
-          <TouchableOpacity style={styles.closeBtn} onPress={handleClose}>
-            <IconSymbol name="xmark" size={16} color={textOnAccent} />
-          </TouchableOpacity>
+          {/* Name + Role */}
+          <Text style={[styles.heroName, { color: textOnAccent }]}>{executive.name}</Text>
+<Text style={[styles.heroRole, { color: `${textOnAccent}CC` }]}>
+  {executive.role}
+</Text>
+{executive.department && (
+  <Text style={[styles.heroDept, { color: `${textOnAccent}99` }]}>
+    {executive.department}
+  </Text>
+)}
+
+          {/* Wave divider */}
+          <View style={[styles.wave, { backgroundColor: C.surface }]} />
         </View>
 
+        {/* ── Body ── */}
         <ScrollView
-          contentContainerStyle={styles.scrollBody}
+          contentContainerStyle={styles.body}
           showsVerticalScrollIndicator={false}
+          bounces
         >
-          {/* Bio — mirrors card bioPreview */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: C.textMuted }]}>ABOUT</Text>
-            <Text style={[styles.bio, { color: C.textSecondary }]}>
-              {executive.bio}
-            </Text>
-          </View>
+          {/* About */}
+          <SectionHeading label="About" C={C} accent={accent} />
+          <Text style={[styles.bodyText, { color: C.textPrimary }]}>{executive.bio}</Text>
 
           {/* Contact */}
           {(executive.email || executive.phone) && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: C.textMuted }]}>CONTACT</Text>
-              <View style={styles.contactList}>
-                {executive.email && (
-                  <ContactRow
-                    icon="envelope.fill"
-                    label="Email"
-                    value={executive.email}
-                    accent={accent}
-                    onPress={() => Linking.openURL(`mailto:${executive.email}`)}
-                  />
-                )}
-                {executive.phone && (
-                  <ContactRow
-                    icon="phone.fill"
-                    label="Phone"
-                    value={executive.phone}
-                    accent={accent}
-                    onPress={() => Linking.openURL(`tel:${executive.phone}`)}
-                  />
-                )}
-              </View>
-            </View>
+            <>
+              <SectionHeading label="Contact" C={C} accent={accent} />
+              {executive.email && (
+                <View style={styles.bullet}>
+                  <View style={[styles.bulletBadge, { backgroundColor: accent + '22' }]}>
+                    <Text style={[styles.bulletNum, { color: accent }]}>@</Text>
+                  </View>
+                  <Text
+                    style={[styles.bulletTxt, { color: C.textPrimary }]}
+                    onPress={() => open(`mailto:${executive.email}`)}
+                  >
+                    {executive.email}
+                  </Text>
+                </View>
+              )}
+              {executive.phone && (
+                <View style={styles.bullet}>
+                  <View style={[styles.bulletBadge, { backgroundColor: accent + '22' }]}>
+                    <Text style={[styles.bulletNum, { color: accent }]}>☎</Text>
+                  </View>
+                  <Text
+                    style={[styles.bulletTxt, { color: C.textPrimary }]}
+                    onPress={() => open(`tel:${executive.phone}`)}
+                  >
+                    {executive.phone}
+                  </Text>
+                </View>
+              )}
+            </>
           )}
 
-          {/* Role badge — mirrors card footer */}
-          <View style={[
-            styles.roleBadge,
-            { backgroundColor: accent + '15', borderColor: accent + '35' }
-          ]}>
-            <View style={[styles.roleDot, { backgroundColor: accent }]} />
-            <Text style={[styles.roleBadgeText, { color: accent }]}>
-              {executive.role} · GHAFRA
-              {executive.since ? ` (${executive.since}–present)` : ''}
-            </Text>
-          </View>
+          {/* Since badge */}
+          {executive.since && (
+            <>
+              <SectionHeading label="Tenure" C={C} accent={accent} />
+              <View style={styles.bullet}>
+                <View style={[styles.bulletBadge, { backgroundColor: accent + '22' }]}>
+                  <Text style={[styles.bulletNum, { color: accent }]}>★</Text>
+                </View>
+                <Text style={[styles.bulletTxt, { color: C.textPrimary }]}>
+                  Member since {executive.since} · GHAFRA
+                </Text>
+              </View>
+            </>
+          )}
+
+          <View style={{ height: 52 }} />
         </ScrollView>
-      </Animated.View>
+      </View>
     </Modal>
   );
 }
 
+const HERO_PT = Platform.OS === 'ios' ? 20 : 32;
+
 const styles = StyleSheet.create({
-  scrim:  {
+  root: { flex: 1 },
+
+  // ── Hero ──
+  hero: {
+    alignItems: 'center',
+    paddingTop: HERO_PT,
+    paddingBottom: 0,
+    paddingHorizontal: 24,
+    overflow: 'hidden',
+  },
+  heroPattern: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    flexDirection: 'row',
   },
-  sheet: {
-    position: 'absolute', bottom: 0, left: 0, right: 0,
-    borderTopLeftRadius: 28, borderTopRightRadius: 28,
-    overflow: 'hidden', maxHeight: height * 0.88,
-  },
-  handle: {
-    width: 38, height: 4, borderRadius: 2,
-    alignSelf: 'center', marginTop: 10, marginBottom: 2,
-  },
-
-  // Hero
-  hero:        { paddingTop: 4, paddingHorizontal: 20, paddingBottom: 22 },
-  flagBar:     { flexDirection: 'row', height: 5, marginBottom: 18, borderRadius: 2, overflow: 'hidden' },
-  flagSeg:     { flex: 1 },
-  heroContent: { flexDirection: 'row', gap: 16, alignItems: 'center' },
-  heroPhotoRing: {
-    width: 80, height: 80, borderRadius: 40,
-    borderWidth: 2.5, overflow: 'hidden',
-  },
-  heroPhoto:    { width: '100%', height: '100%' },
-  heroText:     { flex: 1, gap: 6 },
-  heroName:     { fontSize: 20, fontWeight: '900' },
-  heroPill:     {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20,
-  },
-  heroPillText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
-  heroDept:     { fontSize: 12 },
-  closeBtn:     {
-    position: 'absolute', top: 16, right: 16,
-    width: 32, height: 32, borderRadius: 16,
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    alignItems: 'center', justifyContent: 'center',
+  diagonal: {
+    position: 'absolute',
+    top: -20,
+    bottom: -20,
+    width: 28,
+    backgroundColor: '#fff',
+    transform: [{ rotate: '20deg' }],
   },
 
-  // Body
-  scrollBody:  { padding: 20, gap: 20 },
-  section:     { gap: 10 },
-  sectionTitle:{ fontSize: 10, fontWeight: '700', letterSpacing: 1.2 },
-  bio:         { fontSize: 14, lineHeight: 22 },
+  closeBtn: {
+    alignSelf: 'flex-end',
+    marginBottom: 16,
+  },
+  closePill: {
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+  },
+  closeTxt: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
 
-  // Contact
-  contactList: { gap: 8 },
-  contactRow:  {
-    flexDirection: 'row', alignItems: 'center',
-    gap: 12, padding: 12, borderRadius: 14, borderWidth: 1,
+  avatarOuter: {
+    width: 170,
+    height: 170,
+    borderRadius: 36,
+    borderWidth: 3,
+    padding: 3,
+    marginBottom: 14,
   },
-  contactIcon: {
-    width: 36, height: 36, borderRadius: 10,
-    alignItems: 'center', justifyContent: 'center',
+  avatarInner: {
+    flex: 1,
+    borderRadius: 33,
+    borderWidth: 2,
+    overflow: 'hidden',
   },
-  contactText:  { flex: 1 },
-  contactLabel: { fontSize: 10, fontWeight: '600', letterSpacing: 0.5 },
-  contactValue: { fontSize: 13, fontWeight: '600', marginTop: 1 },
+  avatar: { width: '100%', height: '100%' },
 
-  // Role badge — mirrors card footer style
-  roleBadge: {
-    flexDirection: 'row', alignItems: 'center',
-    gap: 8, padding: 12, borderRadius: 14, borderWidth: 1,
+  heroName: {
+    fontSize: 24,
+    fontWeight: '800',
+    letterSpacing: 0.2,
+    textAlign: 'center',
   },
-  roleDot:      { width: 8, height: 8, borderRadius: 4 },
-  roleBadgeText:{ fontSize: 12, fontWeight: '600', flex: 1 },
+  heroRole: {
+    fontSize: 16,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+    marginTop: 5,
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+  heroDept: {
+  fontSize: 11,
+  fontWeight: '600',
+  textTransform: 'uppercase',
+  letterSpacing: 1.1,
+  marginTop: 3,
+  textAlign: 'center',
+  marginBottom: 22,
+},
+  wave: {
+    height: 4,
+    width: '140%',
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+  },
+
+  // ── Body ──
+  body: {
+    paddingHorizontal: 20,
+  },
+  bodyText: {
+    fontSize: 14.5,
+    lineHeight: 24,
+    letterSpacing: 0.1,
+  },
+
+  bullet: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+    gap: 12,
+  },
+  bulletBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    marginTop: 1,
+  },
+  bulletNum: {
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  bulletTxt: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 22,
+    paddingTop: 5,
+  },
 });

@@ -4,6 +4,9 @@
  * Shared panel for 'conversation' and 'roleplay' modes.
  * Supports light + dark mode via useColors().
  * Input bar is delegated to <MessageInputBar />.
+ *
+ * Android: MessageInputBar is elevated above the system navigation bar
+ * via KeyboardAvoidingView (behavior="height") + useSafeAreaInsets.
  */
 
 import React, { useRef, useEffect } from 'react';
@@ -15,7 +18,10 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ConversationBubble, { BubbleMessage } from './ConversationBubble';
 import MessageInputBar from '../Inputs/MessageInputBar';
 import { useColors } from '@/constants/Colors';
@@ -60,6 +66,7 @@ export default function ConversationPanel({
 }: Props) {
   const C         = useColors();
   const listRef   = useRef<FlatList>(null);
+  const insets    = useSafeAreaInsets();
   const isLoading = chatLoading || transcLoading || ttsLoading;
 
   useEffect(() => {
@@ -69,7 +76,14 @@ export default function ConversationPanel({
   }, [messages]);
 
   return (
-    <>
+    // On Android, KeyboardAvoidingView with behavior="height" shrinks the view
+    // when the soft keyboard appears, keeping MessageInputBar above it.
+    // keyboardVerticalOffset accounts for any top bar so the shift is accurate.
+    <KeyboardAvoidingView
+      style={styles.wrap}
+      behavior={Platform.OS === 'android' ? 'height' : undefined}
+      keyboardVerticalOffset={insets.top}
+    >
       {/* ── Roleplay: scene picker ── */}
       {mode === 'roleplay' && scenes && onSceneChange && (
         <View style={[styles.sceneBar, { backgroundColor: C.surface, borderBottomColor: C.border }]}>
@@ -147,22 +161,28 @@ export default function ConversationPanel({
         </View>
       )}
 
-      {/* ── Input bar (platform-aware safe area) ── */}
-      <MessageInputBar
-        mode={mode}
-        textInput={textInput}
-        onTextChange={onTextChange}
-        onSendText={onSendText}
-        onStartRecord={onStartRecord}
-        onStopRecord={onStopRecord}
-        recording={recording}
-        isLoading={isLoading}
-      />
-    </>
+      {/* ── Input bar ──
+          paddingBottom lifts the bar above the Android gesture/button nav bar.
+          Without this it would sit behind the system navigation on gesture-nav devices. */}
+      <View style={{ paddingBottom: insets.bottom }}>
+        <MessageInputBar
+          mode={mode}
+          textInput={textInput}
+          onTextChange={onTextChange}
+          onSendText={onSendText}
+          onStartRecord={onStartRecord}
+          onStopRecord={onStopRecord}
+          recording={recording}
+          isLoading={isLoading}
+        />
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  wrap: { flex: 1 },
+
   sceneBar: {
     flexDirection:     'row',
     alignItems:        'center',

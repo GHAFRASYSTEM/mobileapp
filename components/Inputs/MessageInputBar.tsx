@@ -3,8 +3,9 @@
  *
  * Extracted input bar (text field + mic + send) from ConversationPanel.
  * - iOS:     adds safe-area bottom padding so the bar sits above the home indicator.
- * - Android: no extra padding — gesture-navigation bar is handled by the OS;
- *            button-navigation phones need no extra room either.
+ * - Android: NO bottom padding here — ConversationPanel wraps this component in a
+ *            View with paddingBottom={insets.bottom}, so adding it here too would
+ *            double-pad and push the bar too high.
  */
 
 import React from 'react';
@@ -44,7 +45,8 @@ export default function MessageInputBar({
   const C      = useColors();
   const insets = useSafeAreaInsets();
 
-  // iOS needs padding for home indicator; Android handles its own nav bar insets.
+  // iOS owns its own bottom inset (home indicator).
+  // Android bottom inset is handled by the parent (ConversationPanel wrapper View).
   const bottomPadding = Platform.OS === 'ios' ? Math.max(insets.bottom, 8) : 8;
 
   return (

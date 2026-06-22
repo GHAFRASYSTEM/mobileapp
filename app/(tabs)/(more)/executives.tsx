@@ -30,20 +30,22 @@ export default function ExecutivesScreen() {
         contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 110 }]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.list}>
-          {EXECUTIVES.map(exec => (
-            <ExecutiveCard
-              key={exec.id}
-              executive={exec}
-              onPress={() => setSelected(exec)}
-            />
-          ))}
-        </View>
+        {EXECUTIVES.map((exec, index) => (
+          <ExecutiveCard
+            key={exec.id}
+            executive={exec}
+            onPress={() => setSelected(exec)}
+            C={C}
+            index={index}
+          />
+        ))}
       </ScrollView>
 
       <ExecutiveModal
         executive={selected}
+        visible={!!selected}
         onClose={() => setSelected(null)}
+        C={C}
       />
     </View>
   );
@@ -51,6 +53,5 @@ export default function ExecutivesScreen() {
 
 const styles = StyleSheet.create({
   root:   { flex: 1 },
-  scroll: { paddingTop: 12 },
-  list:   { paddingHorizontal: 16, gap: 14, paddingBottom: 8 },
+  scroll: { paddingTop: 12, paddingBottom: 8 },
 });

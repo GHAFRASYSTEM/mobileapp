@@ -32,7 +32,18 @@ type PageProps = {
   backRoute?:   Href;
 };
 
-type Props = NavProps | PageProps;
+type PageButtonProps = {
+  variant:      'pageButton';
+  title:        string;
+  subtitle:     string;
+  icon:         IconName;
+  buttonRoute:  Href;
+  showBack?:    boolean;
+  backRoute?:   Href;
+  onIconPress?: never;
+};
+
+type Props = NavProps | PageProps | PageButtonProps;
 
 export default function ScreenHeader(props: Props) {
   const C      = useColors();
@@ -46,6 +57,12 @@ export default function ScreenHeader(props: Props) {
       router.back();
     } else {
       router.push('/(tabs)/(home)');
+    }
+  };
+
+  const handleButtonRoute = () => {
+    if (props.variant === 'pageButton') {
+      router.push(props.buttonRoute);
     }
   };
 
@@ -65,6 +82,25 @@ export default function ScreenHeader(props: Props) {
         onPress={props.onIconPress}
         disabled={!props.onIconPress}
         activeOpacity={props.onIconPress ? 0.7 : 1}
+      >
+        <IconSymbol name={props.icon} size={20} color="#fff" />
+      </TouchableOpacity>
+    </View>
+  ) : props.variant === 'pageButton' ? (
+    <View style={[styles.pageHeader, { paddingTop: insets.top + 10 }]}>
+      {(props.showBack ?? false) && (
+        <TouchableOpacity onPress={handleBack} style={{ marginRight: 12 }}>
+          <IconSymbol name="chevron.left" size={20} color="#fff" />
+        </TouchableOpacity>
+      )}
+      <View style={styles.pageText}>
+        <Text style={styles.pageTitle}>{props.title}</Text>
+        <Text style={styles.pageSubtitle}>{props.subtitle}</Text>
+      </View>
+      <TouchableOpacity
+        style={[styles.iconBtn, { backgroundColor: 'rgba(255,255,255,0.18)' }]}
+        onPress={handleButtonRoute}
+        activeOpacity={0.7}
       >
         <IconSymbol name={props.icon} size={20} color="#fff" />
       </TouchableOpacity>
@@ -141,7 +177,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  // ── Page variant ─────────────────────────────────────────────────────────
+  // ── Page / PageButton variant ─────────────────────────────────────────────────────────
   pageHeader: {
     flexDirection:     'row',
     alignItems:        'center',

@@ -3,6 +3,9 @@
  *
  * Textarea-first UX for grammar correction mode.
  * Supports light + dark mode via useColors().
+ *
+ * iOS: TextInput + button are elevated above the keyboard via
+ * KeyboardAvoidingView (behavior="padding") + useSafeAreaInsets.
  */
 
 import React, { useRef, useEffect, useState } from 'react';
@@ -14,7 +17,10 @@ import {
   FlatList,
   StyleSheet,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ConversationBubble, { BubbleMessage } from './ConversationBubble';
 import { useColors } from '@/constants/Colors';
 
@@ -36,6 +42,7 @@ export default function CorrectionPanel({
   const C = useColors();
   const [draft, setDraft] = useState('');
   const listRef = useRef<FlatList>(null);
+  const insets = useSafeAreaInsets();
 
   const handleSubmit = () => {
     const trimmed = draft.trim();
@@ -51,7 +58,14 @@ export default function CorrectionPanel({
   }, [messages]);
 
   return (
-    <View style={styles.wrap}>
+    // KeyboardAvoidingView wraps everything so the input area rises with the keyboard on iOS.
+    // On Android the OS handles this via windowSoftInputMode="adjustResize" in the manifest.
+    <KeyboardAvoidingView
+      style={styles.wrap}
+      behavior={Platform.OS === 'android' ? 'height' : undefined}
+      // Offset by the bottom safe area so the panel doesn't over-shift on notched devices.
+      keyboardVerticalOffset={insets.top}
+    >
       {/* Hint */}
       <View style={[styles.hint, { backgroundColor: C.primarySubtle, borderColor: C.borderFocus }]}>
         <Text style={styles.hintIcon}>✏️</Text>
@@ -60,7 +74,7 @@ export default function CorrectionPanel({
         </Text>
       </View>
 
-      {/* Message list */}
+      {/* Message list — fills remaining space and scrolls independently */}
       <FlatList
         ref={listRef}
         data={messages}
@@ -85,8 +99,19 @@ export default function CorrectionPanel({
         </View>
       )}
 
-      {/* Input area */}
-      <View style={[styles.inputArea, { backgroundColor: C.surface, borderTopColor: C.border }]}>
+      {/* Input area
+          paddingBottom accounts for the home-indicator safe area so the button
+          is never obscured on Face-ID / Dynamic-Island devices. */}
+      <View
+        style={[
+          styles.inputArea,
+          {
+            backgroundColor: C.surface,
+            borderTopColor: C.border,
+            paddingBottom: insets.bottom + 12,
+          },
+        ]}
+      >
         <TextInput
           value={draft}
           onChangeText={setDraft}
@@ -117,7 +142,7 @@ export default function CorrectionPanel({
           )}
         </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -146,14 +171,16 @@ const styles = StyleSheet.create({
   loadingText: { fontSize: 12 },
 
   inputArea: {
-    padding: 12, gap: 8,
+    padding: 12,
+    paddingTop: 12,   // top stays fixed; bottom is set dynamically via insets
+    gap: 8,
     borderTopWidth: 0.5,
   },
   input: {
     borderRadius: 12, padding: 14, fontSize: 15,
     minHeight: 80, maxHeight: 140, borderWidth: 1,
   },
-  btn:        { borderRadius: 12, padding: 14, alignItems: 'center' },
+  btn:         { borderRadius: 12, padding: 14, alignItems: 'center' },
   btnDisabled: { opacity: 0.4 },
-  btnTxt:     { fontWeight: '700', fontSize: 15 },
+  btnTxt:      { fontWeight: '700', fontSize: 15 },
 });

@@ -46,7 +46,6 @@ export default function ProfileScreen() {
     { label: 'Region',       value: profile.region       },
     { label: 'Role',         value: profile.role         },
     { label: 'Member type',  value: profile.member_type  },
-    { label: 'Member since', value: memberSince          },
   ];
 
   const formatValue = (label: string, value: string | null | undefined) => {

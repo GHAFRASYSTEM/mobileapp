@@ -52,7 +52,7 @@ export default function RootLayout() {
   return (
         <AuthProvider>
 <StripeProvider
-  publishableKey="pk_test_51TJEPSI3MBQn5A74Xa03xKa1PhLUhTgyTwMPHtFyja2nRbohH7luhMN7jstVPvFu44SvuO89FfWwZZ80CNoL5rDg00bEzY2rbM"
+  publishableKey="pk_live_51TJEPKRIC5ZHGbcCBkBi04zFyC1lzHkRBB8jWOHjhRn9VN8pi5sctwHipdOGC6YMNbA0Dg0KgY5sLDclZhvy9NcQ00Pqmsg7CQ"
   {...(Platform.OS === 'ios' && {
     merchantIdentifier: 'merchant.org.ghafra',
   })}

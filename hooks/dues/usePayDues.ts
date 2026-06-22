@@ -28,6 +28,7 @@ export function usePayDues() {
         label:             string;
         type:              string;
       }>('/dues/create-payment-intent', { type, amount });
+      console.log('intent response:', JSON.stringify(intent));
 
       // 2. Init Stripe Payment Sheet
       const { error: initError } = await initPaymentSheet({

@@ -1,25 +1,37 @@
-import { Stack } from 'expo-router';
+import { Stack } from "expo-router";
 
 export default function StandaloneLayout() {
   return (
-    <Stack >
+    <Stack>
       <Stack.Screen name="notifications" options={{ headerShown: false }} />
-      <Stack.Screen name="housingDetail/[id]" options={{ headerShown: false }} />
-       <Stack.Screen
+      <Stack.Screen
+        name="housingDetail/[id]"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="announcement/[id]"
-        options={{ presentation: 'modal', headerShown: false }}
+        options={{ presentation: "modal", headerShown: false }}
       />
-             <Stack.Screen
+      <Stack.Screen
         name="frenchResource/[id]"
-        options={{ presentation: 'modal', headerShown: false }}
-      />   <Stack.Screen
+        options={{ presentation: "modal", headerShown: false }}
+      />{" "}
+      <Stack.Screen
         name="frenchLesson/[id]"
-        options={{ presentation: 'modal', headerShown: false }}
+        options={{ presentation: "modal", headerShown: false }}
+      />
+      <Stack.Screen
+        name="frenchAI/index"
+        options={{ presentation: "modal", headerShown: false }}
       />
        <Stack.Screen
-        name="frenchAI/index"
+        name="JobInternship/Jobdetailscreen"
         options={{ presentation: 'modal', headerShown: false }}
-      />
+      /> 
+        <Stack.Screen
+        name="JobInternship/summit"
+        options={{ presentation: 'modal', headerShown: false }}
+      />  
     </Stack>
   );
 }

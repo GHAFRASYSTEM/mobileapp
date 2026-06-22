@@ -22,7 +22,7 @@ export const ENGINEERS: Engineer[] = [
     id: 'agyemang-dev',
     name: 'GYAMFI Nana Agyemang (AgyemangDev)',
     role: 'Lead Full-Stack Engineer',
-    avatar: 'https://media.licdn.com/dms/image/v2/D4E35AQHjbaBBxsc3Gw/profile-framedphoto-shrink_800_800/B4EZvcFcYiIEAg-/0/1768923973451?e=1778230800&v=beta&t=CxeJe4awnQxpa4anNKzZJmys7u6fh_-CDE_v0CT1Pj8',
+    avatar: 'https://media.licdn.com/dms/image/v2/D4E35AQHjbaBBxsc3Gw/profile-framedphoto-shrink_800_800/B4EZvcFcYiIEAg-/0/1768923973451?e=1780272000&v=beta&t=MhmqTWL_VKpZmsmdLgT8DQUToJIvWCm1uFRY6RzF6_U',
     shortBio:
       "Led mobile & backend engineering — architecting the systems that power GHAFRA's core digital infrastructure.",
 fullBio: 'AgyemangDev holds a BSc in Computer Science from KNUST and an ongoing MSc in Software Engineering from Junia, France. He is the Lead Technical Officer of HostelHubb, a platform simplifying campus life for university students across Ghana. His expertise lies in mobile and web system architecture — he has worked across multiple startups, helping bring their ideas to life and strengthening their digital presence.',
@@ -42,7 +42,7 @@ fullBio: 'AgyemangDev holds a BSc in Computer Science from KNUST and an ongoing 
   "id": "2",
   "name": "Derrick Marfo",
   "role": "Software Engineer & AI Specialist",
-  "avatar": "https://media.licdn.com/dms/image/v2/D5603AQG-_voWV55OlA/profile-displayphoto-crop_800_800/B56ZpjQwk8HIAI-/0/1762601930578?e=1779321600&v=beta&t=3u-uQtTGuJbZe31aBNIVhs0n-hXYuH0S1FK8RM4I7VQ",
+  "avatar": "https://media.licdn.com/dms/image/v2/D5603AQG-_voWV55OlA/profile-displayphoto-crop_800_800/B56ZpjQwk8HIAI-/0/1762601930578?e=1781136000&v=beta&t=hAoqW-8vi0p6QpY9GezNI4Ahy25SprswrVrJeJxR5o8",
   "shortBio": "Computer science graduate and AI master's student building scalable systems and intelligent applications across web and mobile platforms.",
   "fullBio": "Derrick is a software engineer with a strong foundation in computer science and a growing specialization in artificial intelligence. Currently pursuing a master's in AI, he focuses on building intelligent systems, scalable web applications, and data-driven solutions. He has experience working across frontend and backend technologies, integrating APIs, and developing platforms that support real-time data flow. His work also explores machine learning models and AI-driven features to enhance user experience and system capabilities.",
   "contributions": [
@@ -60,7 +60,7 @@ fullBio: 'AgyemangDev holds a BSc in Computer Science from KNUST and an ongoing 
   "id": "alpatson-dev",
   "name": "Alpatson Cobbina Siaw",
   "role": "Full-Stack Developer",
-  "avatar": "https://media.licdn.com/dms/image/v2/D4E03AQEFz6mmohKvSQ/profile-displayphoto-crop_800_800/B4EZntitlLGcAI-/0/1760626924403?e=1779321600&v=beta&t=ca73YlY0C__tGSi9ZexEdk2opa4vRLMDGOUlnE0R96Y",
+  "avatar": "https://media.licdn.com/dms/image/v2/D4E03AQEFz6mmohKvSQ/profile-displayphoto-crop_800_800/B4EZntitlLGcAI-/0/1760626924403?e=1781136000&v=beta&t=D5YoOkXSTN1P5k7bnT3EjQJSSlY10It_k3PYfjmszZU",
   "shortBio": "Software engineering student and chess enthusiast focused on building high-performance full-stack applications with strategic precision.",
   "fullBio": "Alpatson is a software engineering student with three years of experience transitioning from a backend-focused background into comprehensive full-stack development. Much like his approach to chess, he views coding as a series of strategic maneuvers, prioritizing efficiency and long-term scalability in every build. He thrives on solving complex technical puzzles and is currently honing his expertise in modern web frameworks and cloud-integrated systems.",
   "contributions": [
