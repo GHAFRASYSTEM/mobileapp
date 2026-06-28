@@ -164,18 +164,18 @@ export default function ConversationPanel({
       {/* ── Input bar ──
           paddingBottom lifts the bar above the Android gesture/button nav bar.
           Without this it would sit behind the system navigation on gesture-nav devices. */}
-      <View style={{ paddingBottom: insets.bottom }}>
-        <MessageInputBar
-          mode={mode}
-          textInput={textInput}
-          onTextChange={onTextChange}
-          onSendText={onSendText}
-          onStartRecord={onStartRecord}
-          onStopRecord={onStopRecord}
-          recording={recording}
-          isLoading={isLoading}
-        />
-      </View>
+<View style={{ paddingBottom: Platform.OS === 'android' ? insets.bottom : 0 }}>
+  <MessageInputBar
+    mode={mode}
+    textInput={textInput}
+    onTextChange={onTextChange}
+    onSendText={onSendText}
+    onStartRecord={onStartRecord}
+    onStopRecord={onStopRecord}
+    recording={recording}
+    isLoading={isLoading}
+  />
+</View>
     </KeyboardAvoidingView>
   );
 }

@@ -3,15 +3,22 @@
  *
  * Audio-first bubble with automatic playback for the latest assistant message.
  * Supports light + dark mode via useColors().
+ *
+ * Waveform: each message gets a stable, deterministic "fake amplitude"
+ * pattern seeded from its id (so the same message always looks the same,
+ * rather than re-randomizing on every render). It fills the full bubble
+ * width and a real progress sweep — driven by actual playback position —
+ * highlights bars as the audio plays.
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  LayoutChangeEvent,
 } from 'react-native';
 import { Audio } from 'expo-av';
 import { useColors } from '@/constants/Colors';
@@ -31,6 +38,50 @@ interface Props {
   onPlay?:     (text: string) => Promise<string | null>;
   ttsLoading?: boolean;
   isLatest?:   boolean;
+}
+
+// ── Waveform geometry ───────────────────────────────────────────────────────
+const BAR_WIDTH   = 3;
+const BAR_GAP     = 2;
+const BAR_MIN_H   = 6;
+const BAR_MAX_H   = 26;
+
+// ── Deterministic "amplitude" generator ─────────────────────────────────────
+// Same message id always produces the same bar pattern. This is a stable
+// pseudo-random sequence (mulberry32), not real decoded audio amplitude —
+// see PR discussion: a true waveform would need server-side peak extraction.
+function seededRandom(seed: number) {
+  let a = seed;
+  return function () {
+    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function hashString(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = (h << 5) - h + s.charCodeAt(i);
+    h |= 0;
+  }
+  return h;
+}
+
+/** Generate `count` amplitude values in [0,1], stable per seed string. */
+function generateWaveform(seed: string, count: number): number[] {
+  const rand = seededRandom(hashString(seed));
+  const values: number[] = [];
+  // Walk with momentum so neighboring bars don't jump randomly —
+  // reads more like a real waveform envelope than pure noise.
+  let prev = 0.5;
+  for (let i = 0; i < count; i++) {
+    const jitter = (rand() - 0.5) * 0.6;
+    prev = Math.min(1, Math.max(0.15, prev + jitter));
+    values.push(prev);
+  }
+  return values;
 }
 
 // ── Shared helper: reset audio session before every play ──────────────────────
@@ -58,10 +109,24 @@ export default function ConversationBubble({
   const [showCorrection,  setShowCorrection]  = useState(false);
   const [isPlaying,       setIsPlaying]       = useState(false);
   const [audioLoading,    setAudioLoading]    = useState(false);
+  const [progress,        setProgress]        = useState(0); // 0..1 playback position
+  const [waveformWidth,   setWaveformWidth]   = useState(0);
 
   const soundRef      = useRef<Audio.Sound | null>(null);
   const hasAutoPlayed = useRef(false);
   const isAssistant   = message.role === 'assistant';
+
+  // ── Bar count derived from measured width, so it's always full-width ─────
+  const barCount = Math.max(8, Math.floor(waveformWidth / (BAR_WIDTH + BAR_GAP)));
+  const waveform = React.useMemo(
+    () => generateWaveform(message.id, barCount),
+    [message.id, barCount],
+  );
+
+  const onWaveformLayout = useCallback((e: LayoutChangeEvent) => {
+    const w = e.nativeEvent.layout.width;
+    if (Math.abs(w - waveformWidth) > 1) setWaveformWidth(w);
+  }, [waveformWidth]);
 
   // ── Shared playback logic ─────────────────────────────────────────────────
   const playUri = async (uri: string) => {
@@ -75,8 +140,16 @@ export default function ConversationBubble({
     );
     soundRef.current = sound;
     setIsPlaying(true);
+    setProgress(0);
     sound.setOnPlaybackStatusUpdate(status => {
-      if (status.isLoaded && status.didJustFinish) setIsPlaying(false);
+      if (!status.isLoaded) return;
+      if (status.durationMillis) {
+        setProgress(status.positionMillis / status.durationMillis);
+      }
+      if (status.didJustFinish) {
+        setIsPlaying(false);
+        setProgress(1);
+      }
     });
   };
 
@@ -141,6 +214,8 @@ export default function ConversationBubble({
   }
 
   // ── Assistant bubble ──────────────────────────────────────────────────────
+  const litBarCount = Math.round(progress * waveform.length);
+
   return (
     <View style={[styles.row, styles.rowAssistant]}>
       <View style={[styles.assistantBubble, { backgroundColor: C.surface, borderColor: C.border }]}>
@@ -165,16 +240,26 @@ export default function ConversationBubble({
             )}
           </TouchableOpacity>
 
-          <View style={styles.waveformPlaceholder}>
-            {[0.4, 0.7, 1, 0.6, 0.9, 0.5, 0.8, 0.4, 0.7, 1, 0.6].map((h, i) => (
-              <View
-                key={i}
-                style={[
-                  styles.waveDot,
-                  { height: 6 + h * 16, backgroundColor: C.primary, opacity: isPlaying ? 0.9 : 0.35 },
-                ]}
-              />
-            ))}
+          <View
+            style={styles.waveformContainer}
+            onLayout={onWaveformLayout}
+          >
+            {waveform.map((amp, i) => {
+              const lit = i < litBarCount;
+              return (
+                <View
+                  key={i}
+                  style={[
+                    styles.waveDot,
+                    {
+                      height:          BAR_MIN_H + amp * (BAR_MAX_H - BAR_MIN_H),
+                      backgroundColor: lit ? C.primary : C.primary,
+                      opacity:         lit ? 1 : (isPlaying || progress > 0 ? 0.3 : 0.45),
+                    },
+                  ]}
+                />
+              );
+            })}
           </View>
         </View>
 
@@ -246,22 +331,36 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 4,
     paddingHorizontal:      14,
     paddingVertical:        12,
-    maxWidth:               '88%',
+    width:                  '88%', // fixed width (not maxWidth) so waveform can measure + fill reliably
     gap:                    8,
     borderWidth:            1,
   },
 
-  audioRow:            { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 2 },
-  playBtn:             {
+  audioRow: {
+    flexDirection: 'row',
+    alignItems:    'center',
+    gap:            10,
+    marginBottom:   2,
+    width:          '100%',
+  },
+  playBtn: {
     width: 36, height: 36, borderRadius: 18,
     alignItems: 'center', justifyContent: 'center',
     borderWidth: 1,
   },
-  playIcon:            { fontSize: 14 },
-  waveformPlaceholder: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', gap: 2, height: 28,
+  playIcon: { fontSize: 14 },
+
+  waveformContainer: {
+    flex:          1,           // fills remaining width next to the play button
+    flexDirection: 'row',
+    alignItems:    'center',
+    gap:           BAR_GAP,
+    height:        BAR_MAX_H + 4,
   },
-  waveDot:             { width: 3, borderRadius: 2 },
+  waveDot: {
+    width:        BAR_WIDTH,
+    borderRadius: BAR_WIDTH / 2,
+  },
 
   frenchText: { fontSize: 15, lineHeight: 22, fontWeight: '500' },
 

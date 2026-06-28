@@ -42,12 +42,12 @@ export default function MessageInputBar({
   recording,
   isLoading,
 }: Props) {
-  const C      = useColors();
-  const insets = useSafeAreaInsets();
+  const C = useColors();
 
-  // iOS owns its own bottom inset (home indicator).
-  // Android bottom inset is handled by the parent (ConversationPanel wrapper View).
-  const bottomPadding = Platform.OS === 'ios' ? Math.max(insets.bottom, 8) : 8;
+  // No safe-area inset handling here at all — that's now entirely the
+  // parent's (ConversationPanel) job, and only applied on Android. This is
+  // just fixed visual breathing room, same on iOS and Android.
+  const bottomPadding = 28;
 
   return (
     <View
