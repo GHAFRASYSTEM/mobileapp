@@ -16,23 +16,23 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Audio } from 'expo-av';
 import * as LegacyFS from 'expo-file-system/legacy';
+import { Ionicons } from '@expo/vector-icons';
 
 import { useColors } from '@/constants/Colors';
-import { type CefrLevel, type DictationCheckResult } from '@/hooks/useFrenchAI/types';
+import FrenchAIHeader from '@/components/Headers/FrenchAIHeader';
+import { useFrenchAIContext } from '@/context/FrenchAIContext';
+import { type DictationCheckResult } from '@/hooks/useFrenchAI/types';
 import { useDictation } from '@/hooks/useFrenchAI/useDictation';
-
-const LEVELS: CefrLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
 export default function DictationScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const C = useColors();
-  const params = useLocalSearchParams<{ level?: string }>();
+  const { level } = useFrenchAIContext();   // ← was local useState + LEVELS chip row
 
-  const [level, setLevel] = useState<CefrLevel>((params.level as CefrLevel) || 'A1');
   const [passageText, setPassageText] = useState<string | null>(null);
   const [attempt, setAttempt] = useState('');
   const [result, setResult] = useState<DictationCheckResult | null>(null);
@@ -78,31 +78,9 @@ export default function DictationScreen() {
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: C.background }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <StatusBar barStyle="light-content" backgroundColor={C.header} />
-
-      <View style={{ paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 12, backgroundColor: C.header, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={{ color: '#fff', fontSize: 22 }}>‹</Text>
-        </TouchableOpacity>
-        <Text style={{ color: '#fff', fontSize: 17, fontWeight: '700' }}>Listening & Dictation</Text>
-      </View>
+      <FrenchAIHeader paddingTop={insets.top} title="Dictation" subtitle="Listen & write what you hear" onBack={() => router.back()} />
 
       <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          {LEVELS.map(l => (
-            <TouchableOpacity
-              key={l}
-              onPress={() => setLevel(l)}
-              style={{
-                paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, borderWidth: 1,
-                borderColor: l === level ? C.primary : C.border,
-                backgroundColor: l === level ? C.primarySubtle : 'transparent',
-              }}
-            >
-              <Text style={{ color: l === level ? C.primary : C.textMuted, fontWeight: '600', fontSize: 13 }}>{l}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
         <TouchableOpacity
           onPress={handleGenerate}
           disabled={generateLoading}
@@ -117,7 +95,7 @@ export default function DictationScreen() {
               onPress={() => sound?.replayAsync()}
               style={{ borderWidth: 1, borderColor: C.border, borderRadius: 12, paddingVertical: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8 }}
             >
-              <Text style={{ fontSize: 18 }}>🔊</Text>
+              <Ionicons name="volume-high-outline" size={18} color={C.textPrimary} />
               <Text style={{ color: C.textPrimary, fontWeight: '600' }}>Replay audio</Text>
             </TouchableOpacity>
 

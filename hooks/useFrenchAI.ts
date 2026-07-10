@@ -5,7 +5,7 @@ import * as LegacyFS from 'expo-file-system/legacy';  // ← legacy for cacheDir
 import { File } from 'expo-file-system/next';          // ← new API for writing
 
 export type Mode  = 'conversation' | 'correction' | 'roleplay' | 'pronunciation';
-export type Level = 'A1' | 'A2' | 'B1' | 'B2';
+export type Level = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
 
 interface ChatPayload {
   messages:      { role: 'user' | 'assistant'; content: string }[];

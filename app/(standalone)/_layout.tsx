@@ -21,7 +21,7 @@ export default function StandaloneLayout() {
         options={{ presentation: "modal", headerShown: false }}
       />
       <Stack.Screen
-        name="frenchAI/index"
+        name="frenchAI"
         options={{ presentation: "modal", headerShown: false }}
       />
        <Stack.Screen

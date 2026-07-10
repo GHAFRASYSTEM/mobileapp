@@ -188,3 +188,58 @@ export interface Flashcard {
   followUpQuestion: string;
   sourceType: FlashcardSourceType;
 }
+
+export type VocabCategory =
+  | 'numbers'               // blends counting, telling time, dates, years, weights & measures
+  | 'electrical_appliances'
+  | 'verbs'
+  | 'adjectives'
+  | 'food'
+  | 'family'
+  | 'travel'
+  | 'colors'
+  | 'custom';
+ 
+export type VocabQuizQuestionType = 'listening_choice' | 'sentence_completion';
+ 
+export interface VocabQuizOption {
+  id: string;
+  text: string;
+  correct: boolean;
+  /** Present only on wrong options — shown when the learner taps this one. */
+  wrongExplanation?: string;
+}
+ 
+export interface VocabQuizQuestion {
+  id: string;
+  type: VocabQuizQuestionType;
+  /** listening_choice: the word/phrase spoken aloud. sentence_completion: sentence containing "___". */
+  prompt: string;
+  options: VocabQuizOption[];
+  /** base64 audio of `prompt` being spoken (blank stripped for sentence_completion) */
+  audioBase64?: string;
+}
+ 
+export interface VocabQuizResult {
+  questions: VocabQuizQuestion[];
+}
+ 
+export interface VocabQuizRequestPayload {
+  category?: VocabCategory;
+  words?: string[];
+  userLevel: CefrLevel;
+  count?: number;
+  questionTypes?: VocabQuizQuestionType[];
+  [key: string]: unknown;
+}
+ 
+export const VOCAB_CATEGORIES: { key: VocabCategory; label: string; emoji: string }[] = [
+  { key: 'numbers',               label: 'Numbers & Time', emoji: '🔢' },
+  { key: 'electrical_appliances', label: 'Appliances',     emoji: '🔌' },
+  { key: 'verbs',                 label: 'Verbs',          emoji: '🏃' },
+  { key: 'adjectives',            label: 'Adjectives',     emoji: '🎨' },
+  { key: 'food',                  label: 'Food & Drink',   emoji: '🍽️' },
+  { key: 'family',                label: 'Family',         emoji: '👪' },
+  { key: 'travel',                label: 'Travel',         emoji: '✈️' },
+  { key: 'colors',                label: 'Colors',         emoji: '🌈' },
+];

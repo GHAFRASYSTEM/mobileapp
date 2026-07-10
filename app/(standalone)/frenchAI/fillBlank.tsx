@@ -17,27 +17,27 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 import { useColors } from '@/constants/Colors';
+import FrenchAIHeader from '@/components/Headers/FrenchAIHeader';
+import { useFrenchAIContext } from '@/context/FrenchAIContext';
 import {
-  type CefrLevel,
   type FillBlankFocus,
   type FillBlankExercise,
   type FillBlankCheckResult,
 } from '@/hooks/useFrenchAI/types';
 import { useFillBlank } from '@/hooks/useFrenchAI/useFillBlank';
 
-const LEVELS: CefrLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 const FOCI: FillBlankFocus[] = ['mixed', 'verb_tense', 'vocabulary', 'idiom', 'scrambled_sentence'];
 
 export default function FillBlankScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const C = useColors();
-  const params = useLocalSearchParams<{ level?: string }>();
+  const { level } = useFrenchAIContext();   // ← was local useState + LEVELS chip row
 
-  const [level, setLevel] = useState<CefrLevel>((params.level as CefrLevel) || 'A1');
   const [focus, setFocus] = useState<FillBlankFocus>('mixed');
   const [exercises, setExercises] = useState<FillBlankExercise[]>([]);
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
@@ -62,31 +62,9 @@ export default function FillBlankScreen() {
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: C.background }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <StatusBar barStyle="light-content" backgroundColor={C.header} />
-
-      <View style={{ paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 12, backgroundColor: C.header, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={{ color: '#fff', fontSize: 22 }}>‹</Text>
-        </TouchableOpacity>
-        <Text style={{ color: '#fff', fontSize: 17, fontWeight: '700' }}>Fill in the Blank</Text>
-      </View>
+      <FrenchAIHeader paddingTop={insets.top} title="Fill in the Blank" subtitle="Grammar & vocab drills" onBack={() => router.back()} />
 
       <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          {LEVELS.map(l => (
-            <TouchableOpacity
-              key={l}
-              onPress={() => setLevel(l)}
-              style={{
-                paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, borderWidth: 1,
-                borderColor: l === level ? C.primary : C.border,
-                backgroundColor: l === level ? C.primarySubtle : 'transparent',
-              }}
-            >
-              <Text style={{ color: l === level ? C.primary : C.textMuted, fontWeight: '600', fontSize: 13 }}>{l}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           {FOCI.map(f => (
             <TouchableOpacity
@@ -154,9 +132,16 @@ export default function FillBlankScreen() {
               </TouchableOpacity>
 
               {res && (
-                <Text style={{ color: res.correct ? '#4caf6f' : '#e05252', fontSize: 13 }}>
-                  {res.correct ? '✓ Correct!' : `✗ Correct answer: ${res.correctAnswer}`} — {res.explanation}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 4 }}>
+                  <Ionicons
+                    name={res.correct ? 'checkmark-circle' : 'close-circle'}
+                    size={15}
+                    color={res.correct ? '#4caf6f' : '#e05252'}
+                  />
+                  <Text style={{ color: res.correct ? '#4caf6f' : '#e05252', fontSize: 13, flex: 1 }}>
+                    {res.correct ? 'Correct!' : `Correct answer: ${res.correctAnswer}`} — {res.explanation}
+                  </Text>
+                </View>
               )}
             </View>
           );

@@ -1,37 +1,25 @@
 // app/(standalone)/frenchAI/writing.tsx
-//
-// AI Writing + Instant Correction. Paste/type text, get corrections,
-// vocab suggestions, a natural rewrite, and a CEFR read on the writing.
-
 import React, { useState } from 'react';
 import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StatusBar,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
+  KeyboardAvoidingView, Platform, ScrollView, StatusBar,
+  Text, TextInput, TouchableOpacity, View, ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 import { useColors } from '@/constants/Colors';
-import { type CefrLevel, type WritingCorrectionResult } from '@/hooks/useFrenchAI/types';
-import { useWritingCorrection } from '@/hooks/useFrenchAI/useWritingCorrection';
-
-const LEVELS: CefrLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+import FrenchAIHeader from '@/components/Headers/FrenchAIHeader';
+import { useFrenchAIContext } from '@/context/FrenchAIContext';
+import {type WritingCorrectionResult } from '@/hooks/useFrenchAI/types';
+import {useWritingCorrection} from '@/hooks/useFrenchAI/useWritingCorrection';
 
 export default function WritingScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const C = useColors();
-  const params = useLocalSearchParams<{ level?: string }>();
+  const { level } = useFrenchAIContext();   // ← was local useState + LEVELS chip row
 
   const [text, setText] = useState('');
-  const [level, setLevel] = useState<CefrLevel>((params.level as CefrLevel) || 'A1');
   const [result, setResult] = useState<WritingCorrectionResult | null>(null);
 
   const { correct, loading, error } = useWritingCorrection();
@@ -43,37 +31,11 @@ export default function WritingScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: C.background }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: C.background }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <StatusBar barStyle="light-content" backgroundColor={C.header} />
-
-      <View style={{ paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 12, backgroundColor: C.header, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={{ color: '#fff', fontSize: 22 }}>‹</Text>
-        </TouchableOpacity>
-        <Text style={{ color: '#fff', fontSize: 17, fontWeight: '700' }}>Writing Correction</Text>
-      </View>
+      <FrenchAIHeader paddingTop={insets.top} title="Writing" subtitle="Instant correction + CEFR read" onBack={() => router.back()} />
 
       <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
-        {/* Level picker */}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          {LEVELS.map(l => (
-            <TouchableOpacity
-              key={l}
-              onPress={() => setLevel(l)}
-              style={{
-                paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, borderWidth: 1,
-                borderColor: l === level ? C.primary : C.border,
-                backgroundColor: l === level ? C.primarySubtle : 'transparent',
-              }}
-            >
-              <Text style={{ color: l === level ? C.primary : C.textMuted, fontWeight: '600', fontSize: 13 }}>{l}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
         <TextInput
           value={text}
           onChangeText={setText}
@@ -89,10 +51,7 @@ export default function WritingScreen() {
         <TouchableOpacity
           onPress={handleSubmit}
           disabled={loading || !text.trim()}
-          style={{
-            backgroundColor: C.primary, borderRadius: 12, paddingVertical: 14,
-            alignItems: 'center', opacity: loading || !text.trim() ? 0.6 : 1,
-          }}
+          style={{ backgroundColor: C.primary, borderRadius: 12, paddingVertical: 14, alignItems: 'center', opacity: loading || !text.trim() ? 0.6 : 1 }}
         >
           {loading ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff', fontWeight: '700' }}>Correct my writing</Text>}
         </TouchableOpacity>
@@ -154,7 +113,7 @@ export default function WritingScreen() {
 function Section({ title, color, children }: { title: string; color: any; children: React.ReactNode }) {
   return (
     <View style={{ backgroundColor: color.surface, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: color.border }}>
-      <Text style={{ color: color.text, fontWeight: '700', marginBottom: 8 }}>{title}</Text>
+      <Text style={{ color: color.textPrimary, fontWeight: '700', marginBottom: 8 }}>{title}</Text>
       {children}
     </View>
   );
