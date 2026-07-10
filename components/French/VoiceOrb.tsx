@@ -19,6 +19,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/constants/Colors';
 
 type Props = {
@@ -95,8 +96,7 @@ export default function VoiceOrb({ style }: Props) {
           style={styles.orb}
           activeOpacity={0.85}
         >
-          {/* Mic icon */}
-          <Text style={styles.icon}>🎤</Text>
+          <Ionicons name="mic" size={24} color="#fff" />
           <Text style={styles.label}>AI Tutor</Text>
         </TouchableOpacity>
       </Animated.View>
@@ -109,10 +109,9 @@ const ORB_SIZE = 68;
 const styles = StyleSheet.create({
   wrap: {
     position: 'absolute',
-    // Removed hardcoded bottom + alignSelf so parent can control position
     alignItems:     'center',
     justifyContent: 'center',
-    zIndex: 100,           // ensure it stays on top
+    zIndex: 100,
   },
   ring: {
     position:     'absolute',
@@ -135,6 +134,5 @@ const styles = StyleSheet.create({
     shadowRadius:    12,
     elevation:       8,
   },
-  icon:  { fontSize: 22 },
   label: { fontSize: 9, color: '#fff', fontWeight: '700', letterSpacing: 0.5 },
 });

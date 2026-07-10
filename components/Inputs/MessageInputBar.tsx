@@ -18,6 +18,7 @@ import {
   Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/constants/Colors';
 import WaveformVisualizer from '../French/WaveformVisualizer';
 
@@ -67,7 +68,8 @@ export default function MessageInputBar({
             onPress={onStopRecord}
             style={[styles.stopBtn, { backgroundColor: C.danger }]}
           >
-            <Text style={[styles.stopBtnText, { color: C.textInverse }]}>■ Stop</Text>
+            <Ionicons name="stop" size={13} color={C.textInverse} />
+            <Text style={[styles.stopBtnText, { color: C.textInverse }]}>Stop</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -95,7 +97,7 @@ export default function MessageInputBar({
             style={[styles.iconBtn, { backgroundColor: C.primarySubtle }]}
             disabled={isLoading}
           >
-            <Text style={styles.micIcon}>🎤</Text>
+            <Ionicons name="mic" size={18} color={C.primary} />
           </TouchableOpacity>
 
           {textInput.length > 0 && (
@@ -104,7 +106,7 @@ export default function MessageInputBar({
               style={[styles.iconBtn, { backgroundColor: C.primary }]}
               disabled={isLoading}
             >
-              <Text style={[styles.sendIcon, { color: C.textInverse }]}>➤</Text>
+              <Ionicons name="send" size={16} color={C.textInverse} />
             </TouchableOpacity>
           )}
         </View>
@@ -143,8 +145,6 @@ const styles = StyleSheet.create({
     alignItems:      'center',
     justifyContent:  'center',
   },
-  micIcon:  { fontSize: 18 },
-  sendIcon: { fontSize: 16 },
 
   recordingRow: {
     flexDirection:  'row',
@@ -153,6 +153,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   stopBtn: {
+    flexDirection:     'row',
+    alignItems:        'center',
+    gap:               6,
     borderRadius:      16,
     paddingHorizontal: 16,
     paddingVertical:   8,

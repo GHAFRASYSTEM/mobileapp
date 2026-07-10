@@ -12,6 +12,7 @@ import { Level } from '@/types/french.types';
 import { FRENCH_RESOURCES } from '@/assets/data/resources.data';
 import LevelFilterBar from '@/components/French/LevelFilterBar';
 import ResourceCard from '@/components/French/ResourceCard';
+import { Ionicons } from '@expo/vector-icons';
 // ✅ NEW
 import VoiceOrb from '@/components/French/VoiceOrb';
 
@@ -60,8 +61,8 @@ export default function LearnFrenchScreen() {
       />
 
       {/* Search bar */}
-      <View style={[styles.searchRow, { backgroundColor: C.surface, borderColor: C.border }]}>
-        <Text style={[styles.searchIcon, { color: C.textMuted }]}>🔍</Text>
+  <View style={[styles.searchRow, { backgroundColor: C.surface, borderColor: C.border }]}>
+        <Ionicons name="search" size={15} color={C.textMuted} />
         <TextInput
           value={search}
           onChangeText={setSearch}
@@ -71,7 +72,7 @@ export default function LearnFrenchScreen() {
         />
         {search.length > 0 && (
           <TouchableOpacity onPress={() => setSearch('')}>
-            <Text style={[styles.clearBtn, { color: C.textMuted }]}>✕</Text>
+            <Ionicons name="close" size={15} color={C.textMuted} />
           </TouchableOpacity>
         )}
       </View>

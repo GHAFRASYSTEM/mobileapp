@@ -16,6 +16,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Audio } from 'expo-av';
+import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/constants/Colors';
 import type { ScoreResult } from '@/hooks/useFrenchAI';
 
@@ -175,7 +176,7 @@ export default function PronunciationPanel({
               <ActivityIndicator size="small" color={C.primary} />
             ) : (
               <>
-                <Text style={pp.listenIcon}>🔊</Text>
+                <Ionicons name="volume-high-outline" size={16} color={C.primary} />
                 <Text style={[pp.listenTxt, { color: C.primary }]}>Listen first</Text>
               </>
             )}
@@ -186,7 +187,8 @@ export default function PronunciationPanel({
             style={[pp.nextBtn, { backgroundColor: C.background, borderColor: C.border }]}
             disabled={phrases.length < 2}
           >
-            <Text style={[pp.nextTxt, { color: C.textSecondary }]}>Next phrase ↻</Text>
+            <Ionicons name="refresh" size={14} color={C.textSecondary} />
+            <Text style={[pp.nextTxt, { color: C.textSecondary }]}>Next phrase</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -194,9 +196,15 @@ export default function PronunciationPanel({
       {/* Instructions */}
       {!scoreResult && recordState === 'idle' && (
         <View style={[pp.instructionBox, { backgroundColor: C.surface, borderColor: C.border }]}>
+          <View style={pp.instructionLine}>
+            <Text style={[pp.instructionText, { color: C.textSecondary }]}>1. Tap </Text>
+            <Ionicons name="volume-high-outline" size={13} color={C.textSecondary} />
+            <Text style={[pp.instructionText, { color: C.textSecondary }]}> to hear the phrase</Text>
+          </View>
           <Text style={[pp.instructionText, { color: C.textSecondary }]}>
-            1. Tap 🔊 to hear the phrase{'\n'}
-            2. Tap the mic to record yourself{'\n'}
+            2. Tap the mic to record yourself
+          </Text>
+          <Text style={[pp.instructionText, { color: C.textSecondary }]}>
             3. Tap stop when done — you'll get scored instantly
           </Text>
         </View>
@@ -220,13 +228,13 @@ export default function PronunciationPanel({
           </>
         ) : recordState === 'recording' ? (
           <>
-            <Text style={pp.recordIcon}>■</Text>
+            <Ionicons name="stop" size={22} color={C.textPrimary} />
             <Text style={[pp.recordTxt, { color: C.textPrimary }]}>Stop recording</Text>
             <View style={[pp.recordingDot, { backgroundColor: C.danger }]} />
           </>
         ) : (
           <>
-            <Text style={pp.recordIcon}>🎤</Text>
+            <Ionicons name="mic" size={22} color={C.textPrimary} />
             <Text style={[pp.recordTxt, { color: C.textPrimary }]}>Record yourself</Text>
           </>
         )}
@@ -268,23 +276,23 @@ const pp = StyleSheet.create({
     flex: 1, borderRadius: 12, padding: 12,
     alignItems: 'center', flexDirection: 'row', gap: 6, justifyContent: 'center',
   },
-  listenIcon: { fontSize: 14 },
   listenTxt:  { fontWeight: '600', fontSize: 13 },
 
   nextBtn: {
     flex: 1, borderRadius: 12, padding: 12,
-    alignItems: 'center', borderWidth: 1,
+    alignItems: 'center', flexDirection: 'row', gap: 6, justifyContent: 'center',
+    borderWidth: 1,
   },
   nextTxt: { fontWeight: '600', fontSize: 13 },
 
-  instructionBox: { borderRadius: 12, padding: 14, borderWidth: 1 },
+  instructionBox:  { borderRadius: 12, padding: 14, borderWidth: 1, gap: 4 },
+  instructionLine: { flexDirection: 'row', alignItems: 'center' },
   instructionText: { fontSize: 13, lineHeight: 22 },
 
   recordBtn: {
     borderRadius: 16, padding: 20, alignItems: 'center',
     gap: 6, borderWidth: 2, flexDirection: 'row', justifyContent: 'center',
   },
-  recordIcon:   { fontSize: 24 },
   recordTxt:    { fontWeight: '700', fontSize: 15 },
   recordingDot: {
     width: 8, height: 8, borderRadius: 4,

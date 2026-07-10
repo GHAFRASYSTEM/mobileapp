@@ -22,6 +22,7 @@ import {
   Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import ConversationBubble, { BubbleMessage } from './ConversationBubble';
 import MessageInputBar from '../Inputs/MessageInputBar';
 import { useColors } from '@/constants/Colors';
@@ -133,7 +134,10 @@ export default function ConversationPanel({
       {/* ── Dynamic AI suggestions ── */}
       {suggestions.length > 0 && !recording && (
         <View style={[styles.suggestBar, { backgroundColor: C.surface, borderTopColor: C.border }]}>
-          <Text style={[styles.suggestLabel, { color: C.textMuted }]}>💡 Try saying:</Text>
+          <View style={styles.suggestLabelRow}>
+            <Ionicons name="bulb-outline" size={13} color={C.textMuted} />
+            <Text style={[styles.suggestLabel, { color: C.textMuted }]}>Try saying:</Text>
+          </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.suggestChips}>
               {suggestions.map((s, i) => (
@@ -199,7 +203,8 @@ const styles = StyleSheet.create({
   messageList: { padding: 12, gap: 8, flexGrow: 1 },
 
   suggestBar:      { paddingHorizontal: 12, paddingVertical: 8, borderTopWidth: 0.5 },
-  suggestLabel:    { fontSize: 11, marginBottom: 6 },
+  suggestLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6 },
+  suggestLabel:    { fontSize: 11 },
   suggestChips:    { flexDirection: 'row', gap: 8 },
   suggestChip:     { borderRadius: 14, paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1 },
   suggestChipText: { fontSize: 13, fontWeight: '600' },

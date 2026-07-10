@@ -7,15 +7,18 @@
 
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/constants/Colors';
 import type { Mode, Level } from '@/hooks/useFrenchAI';
 
-const MODES: { key: Mode; label: string; emoji: string; hint: string }[] = [
-  { key: 'conversation',  label: 'Chat',      emoji: '💬', hint: 'Free conversation practice' },
-  { key: 'roleplay',      label: 'Roleplay',  emoji: '🎭', hint: 'Act out a real-life scene'  },
-  { key: 'pronunciation', label: 'Pronounce', emoji: '🔊', hint: 'Record & get scored'         },
-  { key: 'correction',    label: 'Correct',   emoji: '✏️',  hint: 'Fix your French writing'    },
-];
+// hint text keyed by mode — icon rendering for the mode tabs themselves
+// lives in the mode bar (index.tsx), this header only needs the hint copy.
+const MODE_HINTS: Record<Mode, string> = {
+  conversation:  'Free conversation practice',
+  roleplay:      'Act out a real-life scene',
+  pronunciation: 'Record & get scored',
+  correction:    'Fix your French writing',
+};
 
 interface Props {
   paddingTop:   number;
@@ -39,13 +42,16 @@ export default function FrenchAIHeader({
   return (
     <View style={[styles.header, { paddingTop: paddingTop + 8, backgroundColor: C.header }]}>
       <TouchableOpacity onPress={onBack} style={styles.backBtn}>
-        <Text style={[styles.backIcon, { color: C.textInverse }]}>←</Text>
+        <Ionicons name="arrow-back" size={22} color={C.textInverse} />
       </TouchableOpacity>
 
       <View style={styles.headerCenter}>
-        <Text style={[styles.headerTitle, { color: C.textInverse }]}>🇫🇷 French Tutor</Text>
+        <View style={styles.titleRow}>
+          <Ionicons name="language-outline" size={16} color={C.textInverse} />
+          <Text style={[styles.headerTitle, { color: C.textInverse }]}>French Tutor</Text>
+        </View>
         <Text style={[styles.headerSub, { color: C.primarySubtle }]}>
-          {MODES.find(m => m.key === activeMode)?.hint}
+          {MODE_HINTS[activeMode]}
         </Text>
       </View>
 
@@ -69,10 +75,10 @@ const styles = StyleSheet.create({
     gap:              12,
   },
   backBtn:        { padding: 4 },
-  backIcon:       { fontSize: 22 },
   headerCenter:   { flex: 1 },
+  titleRow:       { flexDirection: 'row', alignItems: 'center', gap: 6 },
   headerTitle:    { fontSize: 17, fontWeight: '700' },
-  headerSub:      { fontSize: 11, opacity: 0.75 },
+  headerSub:      { fontSize: 11, opacity: 0.75, marginTop: 2 },
   levelPill:      {
     borderRadius:      10,
     paddingHorizontal: 10,

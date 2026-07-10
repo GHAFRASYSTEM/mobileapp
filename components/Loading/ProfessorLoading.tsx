@@ -9,6 +9,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Easing, StatusBar } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/constants/Colors';
 
 export default function ProfessorLoading() {
@@ -54,7 +55,7 @@ export default function ProfessorLoading() {
       />
 
       <Animated.View style={[styles.iconWrap, { backgroundColor: C.primarySubtle, transform: [{ rotate }] }]}>
-        <Text style={styles.iconEmoji}>🇫🇷</Text>
+        <Ionicons name="language-outline" size={28} color={C.primary} />
       </Animated.View>
 
       <Text style={[styles.title, { color: C.textPrimary }]}>
@@ -94,7 +95,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 20,
   },
-  iconEmoji: { fontSize: 28 },
   title: {
     fontSize: 17,
     fontWeight: '600',

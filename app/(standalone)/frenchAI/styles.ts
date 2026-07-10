@@ -28,4 +28,27 @@ export const styles = StyleSheet.create({
   modeTabActive: { borderBottomWidth: 2 },
   modeEmoji:     { fontSize: 16 },
   modeLabel:     { fontSize: 10, fontWeight: '600' },
+  // app/(standalone)/frenchAI/styles.ts  (ADDITIONS — append inside StyleSheet.create)
+
+extraBar: {
+  borderBottomWidth: 1,
+  maxHeight: 52,
+},
+extraBarContent: {
+  paddingHorizontal: 12,
+  paddingVertical: 8,
+  gap: 8,
+  flexDirection: 'row',
+},
+extraChip: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 6,
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 20,
+  borderWidth: 1,
+},
+extraEmoji: { fontSize: 14 },
+extraLabel: { fontSize: 12, fontWeight: '600' },
 });

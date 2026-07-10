@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/constants/Colors';
 import { FrenchResource } from '@/types/french.types';
 import LevelBadge from './LevelBadge';
@@ -9,6 +10,21 @@ import EnBadge   from './EnBadge';
 interface Props {
   item:    FrenchResource;
   onPress: () => void;
+}
+
+// Maps the emoji stored in resources.data.ts to an Ionicons name,
+// so the data file doesn't need to change.
+const ICON_MAP: Record<string, keyof typeof Ionicons.glyphMap> = {
+  '🎬': 'film-outline',
+  '🎧': 'headset-outline',
+  '📖': 'book-outline',
+  '🎵': 'musical-notes-outline',
+  '☕': 'cafe-outline',
+  '🎙️': 'mic-outline',
+};
+
+function getIconName(emoji?: string): keyof typeof Ionicons.glyphMap {
+  return (emoji && ICON_MAP[emoji]) || 'document-text-outline';
 }
 
 export default function ResourceCard({ item, onPress }: Props) {
@@ -26,8 +42,8 @@ export default function ResourceCard({ item, onPress }: Props) {
       <View style={styles.body}>
         {/* ── Top row: icon + title + chips ── */}
         <View style={styles.topRow}>
-          <View style={[styles.emojiBox, { backgroundColor: C.primarySubtle }]}>
-            <Text style={styles.emoji}>{item.emoji}</Text>
+          <View style={[styles.iconBox, { backgroundColor: C.primarySubtle }]}>
+            <Ionicons name={getIconName(item.emoji)} size={20} color={C.primary} />
           </View>
 
           <View style={styles.meta}>
@@ -59,7 +75,7 @@ export default function ResourceCard({ item, onPress }: Props) {
       </View>
 
       {/* Arrow */}
-      <Text style={[styles.arrow, { color: C.textMuted }]}>›</Text>
+      <Ionicons name="chevron-forward" size={20} color={C.textMuted} style={styles.arrow} />
     </TouchableOpacity>
   );
 }
@@ -86,15 +102,12 @@ const styles = StyleSheet.create({
     alignItems:    'flex-start',
     gap:           10,
   },
-  emojiBox: {
+  iconBox: {
     width:           40,
     height:          40,
     borderRadius:    10,
     alignItems:      'center',
     justifyContent:  'center',
-  },
-  emoji: {
-    fontSize: 20,
   },
   meta: {
     flex: 1,
@@ -123,7 +136,6 @@ const styles = StyleSheet.create({
     flexWrap:      'wrap',
   },
   arrow: {
-    fontSize:     22,
     paddingRight: 12,
   },
 });

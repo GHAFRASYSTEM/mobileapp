@@ -9,12 +9,18 @@
  *   - CorrectionPanel    (correction mode)
  *   - PronunciationPanel (pronunciation mode)
  *   - ConversationBubble (message bubbles, audio-first)
+ *
+ * The 5 standalone exercise types (Writing, Dictation, Reading, Fill-Blank,
+ * Flashcards) live as separate routes under app/(standalone)/frenchAI/ —
+ * they don't fit the chat-bubble mode-tab UI, so they're reached via the
+ * "More practice" row below the mode tabs instead of being crammed in.
  */
 
 import React from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
@@ -29,8 +35,10 @@ import ConversationPanel from '@/components/French/ConversationPanel';
 import CorrectionPanel from '@/components/French/CorrectionPanel';
 import PronunciationPanel from '@/components/French/PronunciationPanel';
 import ProfessorLoading from '@/components/Loading/ProfessorLoading';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { MODES } from './constants';
+
+import { MODES, EXTRA_EXERCISES } from './constants';
 import { styles } from './styles';
 import { useFrenchAITutor } from './useFrenchAITutor';
 
@@ -91,25 +99,52 @@ export default function FrenchAIScreen() {
       />
 
       <View style={[styles.modeBar, { backgroundColor: C.surface, borderBottomColor: C.border }]}>
-        {MODES.map(m => (
-          <TouchableOpacity
-            key={m.key}
-            onPress={() => t.setActiveMode(m.key)}
-            style={[
-              styles.modeTab,
-              t.activeMode === m.key && [styles.modeTabActive, { borderBottomColor: C.primary }],
-            ]}
-          >
-            <Text style={styles.modeEmoji}>{m.emoji}</Text>
-            <Text style={[
-              styles.modeLabel,
-              { color: t.activeMode === m.key ? C.primary : C.textMuted },
-            ]}>
-              {m.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
+{MODES.map(m => {
+  const color = t.activeMode === m.key ? C.primary : C.textMuted;
+  return (
+    <TouchableOpacity
+      key={m.key}
+      onPress={() => t.setActiveMode(m.key)}
+      style={[
+        styles.modeTab,
+        t.activeMode === m.key && [styles.modeTabActive, { borderBottomColor: C.primary }],
+      ]}
+    >
+      {m.iconSet === 'mci' ? (
+        <MaterialCommunityIcons name={m.icon as any} size={18} color={color} />
+      ) : (
+        <Ionicons name={m.icon as any} size={18} color={color} />
+      )}
+      <Text style={[styles.modeLabel, { color }]}>
+        {m.label}
+      </Text>
+    </TouchableOpacity>
+  );
+})}
       </View>
+
+      {/* More practice row — links to standalone exercise screens */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={[styles.extraBar, { borderBottomColor: C.border }]}
+        contentContainerStyle={styles.extraBarContent}
+      >
+{EXTRA_EXERCISES.map(ex => (
+  <TouchableOpacity
+    key={ex.route}
+    onPress={() => router.push({ pathname: ex.route, params: { level: t.activeLevel } } as any)}
+    style={[styles.extraChip, { backgroundColor: C.surface, borderColor: C.border }]}
+  >
+    {ex.iconSet === 'mci' ? (
+      <MaterialCommunityIcons name={ex.icon as any} size={15} color={C.textSecondary} />
+    ) : (
+      <Ionicons name={ex.icon as any} size={15} color={C.textSecondary} />
+    )}
+    <Text style={[styles.extraLabel, { color: C.textSecondary }]}>{ex.label}</Text>
+  </TouchableOpacity>
+))}
+      </ScrollView>
 
       {t.activeMode === 'pronunciation' && (
         <PronunciationPanel

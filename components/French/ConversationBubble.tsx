@@ -21,6 +21,7 @@ import {
   LayoutChangeEvent,
 } from 'react-native';
 import { Audio } from 'expo-av';
+import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/constants/Colors';
 
 export interface BubbleMessage {
@@ -234,9 +235,11 @@ export default function ConversationBubble({
             {audioLoading ? (
               <ActivityIndicator size="small" color={C.primary} />
             ) : (
-              <Text style={[styles.playIcon, { color: isPlaying ? C.textInverse : C.primary }]}>
-                {isPlaying ? '⏸' : '▶'}
-              </Text>
+              <Ionicons
+                name={isPlaying ? 'pause' : 'play'}
+                size={14}
+                color={isPlaying ? C.textInverse : C.primary}
+              />
             )}
           </TouchableOpacity>
 
@@ -272,8 +275,13 @@ export default function ConversationBubble({
             onPress={() => setShowTranslation(v => !v)}
             style={styles.toggleRow}
           >
+            <Ionicons
+              name={showTranslation ? 'chevron-up' : 'chevron-down'}
+              size={13}
+              color={C.blue}
+            />
             <Text style={[styles.toggleLabel, { color: C.blue }]}>
-              {showTranslation ? '▲ Hide translation' : '▼ Show translation'}
+              {showTranslation ? 'Hide translation' : 'Show translation'}
             </Text>
           </TouchableOpacity>
         )}
@@ -289,8 +297,13 @@ export default function ConversationBubble({
             onPress={() => setShowCorrection(v => !v)}
             style={[styles.toggleRow, styles.correctionToggle]}
           >
+            <Ionicons
+              name={showCorrection ? 'chevron-up' : 'alert-circle-outline'}
+              size={13}
+              color={C.gold}
+            />
             <Text style={[styles.toggleLabel, { color: C.gold }]}>
-              {showCorrection ? '▲ Hide correction' : '❌ See correction'}
+              {showCorrection ? 'Hide correction' : 'See correction'}
             </Text>
           </TouchableOpacity>
         )}
@@ -303,7 +316,8 @@ export default function ConversationBubble({
         {/* Tip */}
         {message.tip && (
           <View style={[styles.tipBox, { backgroundColor: C.primarySubtle, borderLeftColor: C.primary }]}>
-            <Text style={[styles.tipText, { color: C.textSuccess }]}>💡 {message.tip}</Text>
+            <Ionicons name="bulb-outline" size={13} color={C.textSuccess} style={styles.tipIcon} />
+            <Text style={[styles.tipText, { color: C.textSuccess }]}>{message.tip}</Text>
           </View>
         )}
       </View>
@@ -348,7 +362,6 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
     borderWidth: 1,
   },
-  playIcon: { fontSize: 14 },
 
   waveformContainer: {
     flex:          1,           // fills remaining width next to the play button
@@ -364,7 +377,7 @@ const styles = StyleSheet.create({
 
   frenchText: { fontSize: 15, lineHeight: 22, fontWeight: '500' },
 
-  toggleRow:        { flexDirection: 'row', alignItems: 'center', paddingVertical: 2 },
+  toggleRow:        { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 2 },
   correctionToggle: { marginTop: 2 },
   toggleLabel:      { fontSize: 11, fontWeight: '600' },
 
@@ -379,7 +392,9 @@ const styles = StyleSheet.create({
   correctionText: { fontSize: 12, lineHeight: 18 },
 
   tipBox: {
+    flexDirection: 'row', alignItems: 'flex-start', gap: 6,
     borderRadius: 8, padding: 8, borderLeftWidth: 2, marginTop: 2,
   },
-  tipText: { fontSize: 12, lineHeight: 17 },
+  tipIcon: { marginTop: 2 },
+  tipText: { flex: 1, fontSize: 12, lineHeight: 17 },
 });
