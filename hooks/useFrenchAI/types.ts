@@ -198,6 +198,7 @@ export type VocabCategory =
   | 'family'
   | 'travel'
   | 'colors'
+  |"quantifiers"
   | 'custom';
  
 export type VocabQuizQuestionType = 'listening_choice' | 'sentence_completion';
@@ -208,6 +209,7 @@ export interface VocabQuizOption {
   correct: boolean;
   /** Present only on wrong options — shown when the learner taps this one. */
   wrongExplanation?: string;
+  englishHint?: string;
 }
  
 export interface VocabQuizQuestion {
@@ -218,6 +220,7 @@ export interface VocabQuizQuestion {
   options: VocabQuizOption[];
   /** base64 audio of `prompt` being spoken (blank stripped for sentence_completion) */
   audioBase64?: string;
+   sayItOutLoud?: string;
 }
  
 export interface VocabQuizResult {
@@ -235,6 +238,7 @@ export interface VocabQuizRequestPayload {
  
 export const VOCAB_CATEGORIES: { key: VocabCategory; label: string; emoji: string }[] = [
   { key: 'numbers',               label: 'Numbers & Time', emoji: '🔢' },
+  { key: 'quantifiers',  label: 'Quantity Words',        emoji: '📏' },
   { key: 'electrical_appliances', label: 'Appliances',     emoji: '🔌' },
   { key: 'verbs',                 label: 'Verbs',          emoji: '🏃' },
   { key: 'adjectives',            label: 'Adjectives',     emoji: '🎨' },
