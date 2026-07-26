@@ -21,6 +21,14 @@ export const SECTIONS: Section[] = [
     accentTx: '#006B3F',
   },
   {
+    label:    'Pickup at Lille',
+    sub:      'Arrange your station pickup',
+    icon:     'directions-car',
+    route:    '/pickup',
+    accent:   '#E6EEFF',
+    accentTx: '#002395',
+  },
+  {
     label:    'Event Calendar',
     sub:      'Upcoming events',
     icon:     'calendar-today',
@@ -28,7 +36,6 @@ export const SECTIONS: Section[] = [
     accent:   '#FFF8DC',
     accentTx: '#7A5500',
   },
-
   {
     label:    'Jobs & Internships',
     sub:      'Find jobs, internships, and career opportunities',
@@ -45,7 +52,6 @@ export const SECTIONS: Section[] = [
     accent:   '#E8F5EE',
     accentTx: '#006B3F',
   },
-
   {
     label:    'GhaFra Care',
     sub:      'Support & assistance',
@@ -54,8 +60,6 @@ export const SECTIONS: Section[] = [
     accent:   '#FDECEA',
     accentTx: '#A50D1E',
   },
-
-  // OTA Update
   {
     label:    'Market & Services',
     sub:      'Buy, sell & hire',
