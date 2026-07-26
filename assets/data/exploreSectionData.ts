@@ -21,20 +21,12 @@ export const SECTIONS: Section[] = [
     accentTx: '#006B3F',
   },
   {
-    label:    'Pickup at Lille',
+    label:    'Pickup',
     sub:      'Arrange your station pickup',
     icon:     'directions-car',
     route:    '/pickup',
     accent:   '#E6EEFF',
     accentTx: '#002395',
-  },
-  {
-    label:    'Event Calendar',
-    sub:      'Upcoming events',
-    icon:     'calendar-today',
-    route:    '/(tabs)/(community)/eventCalendar',
-    accent:   '#FFF8DC',
-    accentTx: '#7A5500',
   },
   {
     label:    'Jobs & Internships',
@@ -45,6 +37,22 @@ export const SECTIONS: Section[] = [
     accentTx: '#002395',
   },
   {
+    label:    'Market & Services',
+    sub:      'Buy, sell & hire',
+    icon:     'storefront',
+    route:    '/(tabs)/(community)/marketservice',
+    accent:   '#FFF8DC',
+    accentTx: '#7A5500',
+  },
+    {
+    label:    'Event Calendar',
+    sub:      'Upcoming events',
+    icon:     'calendar-today',
+    route:    '/(tabs)/(community)/eventCalendar',
+    accent:   '#FFF8DC',
+    accentTx: '#7A5500',
+  },
+    {
     label:    'Tour & Explore',
     sub:      'Discover cities, culture, and hidden gems',
     icon:     'explore',
@@ -52,20 +60,12 @@ export const SECTIONS: Section[] = [
     accent:   '#E8F5EE',
     accentTx: '#006B3F',
   },
-  {
+    {
     label:    'GhaFra Care',
     sub:      'Support & assistance',
     icon:     'favorite',
     route:    '/(tabs)/(community)/ghafra_care',
     accent:   '#FDECEA',
     accentTx: '#A50D1E',
-  },
-  {
-    label:    'Market & Services',
-    sub:      'Buy, sell & hire',
-    icon:     'storefront',
-    route:    '/(tabs)/(community)/marketservice',
-    accent:   '#FFF8DC',
-    accentTx: '#7A5500',
   },
 ];

@@ -91,7 +91,7 @@ export default function PickupScreen() {
     <View style={{ flex: 1, backgroundColor: C.background }}>
       <ScreenHeader
         variant="page"
-        title="Pickup at Lille"
+        title="Pickup"
         subtitle="Arrange your station pickup"
         icon="car.fill"
         showBack
