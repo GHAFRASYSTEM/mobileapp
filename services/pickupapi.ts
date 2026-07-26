@@ -3,6 +3,14 @@ import { api } from '@/services/api';
 export type Gare = 'Lille Flandres' | 'Lille Europe';
 export type PickupStatus = 'pending' | 'assigned' | 'completed' | 'cancelled';
 
+export type VolunteerContact = {
+  name:          string;
+  email:         string;
+  photo_url:     string | null;
+  ghana_phone:   string | null;
+  french_phone:  string | null;
+};
+
 export type PickupRequest = {
   id:                string;
   user_id:           string;
@@ -19,6 +27,7 @@ export type PickupRequest = {
   ticket_signed_url: string | null; // short-lived, viewable — use this to render
   status:            PickupStatus;
   assigned_to:       string | null;
+  volunteer:         VolunteerContact | null; // populated once a volunteer is assigned
   admin_notes:       string | null;
   created_at:        string;
   updated_at:        string;

@@ -1,7 +1,7 @@
 import { supabase } from "@/constants/supabase";
 
 const BASE_URL =
-    //'https://backend-016i.onrender.com';
+    // 'https://backend-016i.onrender.com';
   // "https://1aa3-2001-861-64d0-f770-b514-d53f-b08f-8bb9.ngrok-free.app ";
   'http://localhost:3000';
 

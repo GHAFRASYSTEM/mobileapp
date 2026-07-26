@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useColors } from '@/constants/Colors';
+import { VolunteerContactCard } from '@/components/Cards/VolunteerContactCard';
 import type { PickupRequest } from '@/services/pickupapi';
 
 type Props = {
@@ -40,6 +41,11 @@ export function PickupStatusCard({ request, onEdit, onCancel }: Props) {
 
   return (
     <View style={{ gap: 16 }}>
+      {/* Volunteer contact — the thing the user actually needs once assigned */}
+      {request.status === 'assigned' && request.volunteer && (
+        <VolunteerContactCard volunteer={request.volunteer} colors={C} />
+      )}
+
       <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
         <View style={styles.statusRow}>
           <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
