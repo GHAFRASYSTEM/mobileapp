@@ -1,10 +1,12 @@
 import { supabase } from "@/constants/supabase";
 
-const BASE_URL =
-    'https://backend-016i.onrender.com';
-  // "https://1aa3-2001-861-64d0-f770-b514-d53f-b08f-8bb9.ngrok-free.app ";
-  // 'http://localhost:3000';
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
+if (!BASE_URL) {
+  throw new Error(
+    'Missing EXPO_PUBLIC_API_URL. Copy .env.example to .env.local.',
+  );
+}
 
 async function getToken(): Promise<string | null> {
   try {
@@ -21,7 +23,6 @@ async function request<T>(
   body?: Record<string, unknown> | FormData,
 ): Promise<T> {
   const token = await getToken();
-
   const headers: Record<string, string> = {
     Accept: "application/json",
     "ngrok-skip-browser-warning": "69420",
@@ -31,11 +32,9 @@ async function request<T>(
   if (!(body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
   }
-
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
   console.log(`[API] → ${method} ${path}`);
-
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
     headers,
@@ -47,15 +46,12 @@ async function request<T>(
   console.log(
     `[API] ← ${res.status} ${path} | content-type: ${res.headers.get("content-type")}`,
   );
-
   if (res.status === 204) return null as T;
 
   const contentType = res.headers.get("content-type") ?? "";
-
   if (contentType.includes("audio/")) {
     return (await res.blob()) as T;
   }
-
   if (!contentType.includes("application/json")) {
     const text = await res.text();
     console.error("[API] Unexpected response:", text.slice(0, 300));
@@ -65,11 +61,9 @@ async function request<T>(
   }
 
   const json = await res.json();
-
   if (!res.ok) {
     throw new Error(json.error?.message ?? `Request failed: ${res.status}`);
   }
-
   return json.data as T;
 }
 
@@ -82,7 +76,6 @@ export const api = {
   patch: <T>(path: string, body: Record<string, unknown>) =>
     request<T>(path, "PATCH", body),
   delete: <T>(path: string) => request<T>(path, "DELETE"),
-
   interview: {
     getContext: () =>
       request<{
@@ -122,9 +115,7 @@ export const api = {
         name: "recording.m4a",
         type: "audio/m4a",
       } as any);
-
       console.log(`[API] → POST /interview/transcribe`);
-
       const res = await fetch(`${BASE_URL}/interview/transcribe`, {
         method: "POST",
         headers: {
@@ -135,11 +126,8 @@ export const api = {
         },
         body: formData,
       });
-
       console.log(`[API] ← ${res.status} /interview/transcribe`);
-
       const contentType = res.headers.get("content-type") || "";
-
       if (!res.ok) {
         let errorMsg = `Transcribe failed: ${res.status}`;
         if (contentType.includes("application/json")) {
@@ -153,7 +141,6 @@ export const api = {
         }
         throw new Error(errorMsg);
       }
-
       return await res.json();
     },
   },
