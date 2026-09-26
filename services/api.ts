@@ -1,6 +1,6 @@
 import { supabase } from "@/constants/supabase";
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL ? process.env.EXPO_PUBLIC_API_URL : 'https://backend-016i.onrender.com';
 
 if (!BASE_URL) {
   throw new Error(
