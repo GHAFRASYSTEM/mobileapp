@@ -1,34 +1,20 @@
-import { StyleSheet, Text, View, Image, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, ScrollView } from 'react-native'
 import React from 'react'
-import type { Listing } from '@/assets/data/jobInternship.types'
+import type { Opportunity } from '@/types/opportunities'
 import { Pill } from '../ui/DetailAtoms'
-import { WORK_MODE_LABEL, EMPLOYMENT_LABEL } from '../../utils/formatters'
+import { closedLabel, formatDeadline, isOpportunityClosed } from '@/utils/opportunities'
 
 interface JobDetailHeroProps {
-  listing: Listing
+  opportunity: Opportunity
   C: any
 }
 
-const JobDetailHero = ({ listing, C }: JobDetailHeroProps) => {
-  const isInternship = listing.type === 'internship'
+const JobDetailHero = ({ opportunity, C }: JobDetailHeroProps) => {
+  const isInternship = opportunity.type === 'internship'
+  const closed = isOpportunityClosed(opportunity)
 
   return (
     <>
-      {/* ── Hero image ── */}
-      {listing.posterImage ? (
-        <Image
-          source={{ uri: listing.posterImage }}
-          style={styles.heroImage}
-          resizeMode="cover"
-        />
-      ) : (
-        <View style={[styles.heroImagePlaceholder, { backgroundColor: C.primarySubtle }]}>
-          <Text style={[styles.heroPlaceholderText, { color: C.primary }]}>
-            {listing.company.slice(0, 2).toUpperCase()}
-          </Text>
-        </View>
-      )}
-
       {/* ── Title block ── */}
       <View style={[styles.titleBlock, { paddingHorizontal: 20 }]}>
         <View style={styles.typeBadgeRow}>
@@ -42,15 +28,24 @@ const JobDetailHero = ({ listing, C }: JobDetailHeroProps) => {
               {isInternship ? 'Internship' : 'Job'}
             </Text>
           </View>
-          <View style={styles.openBadge}>
-            <View style={styles.openDot} />
-            <Text style={styles.openText}>Open</Text>
-          </View>
+
+          {closed ? (
+            <View style={[styles.statusBadge, styles.closedBadge]}>
+              <Text style={[styles.statusText, { color: '#9A3412' }]}>
+                {closedLabel(opportunity)}
+              </Text>
+            </View>
+          ) : (
+            <View style={[styles.statusBadge, styles.openBadge]}>
+              <View style={styles.openDot} />
+              <Text style={[styles.statusText, { color: '#15803D' }]}>Open</Text>
+            </View>
+          )}
         </View>
 
-        <Text style={[styles.jobTitle, { color: C.textPrimary }]}>{listing.title}</Text>
+        <Text style={[styles.jobTitle, { color: C.textPrimary }]}>{opportunity.title}</Text>
         <Text style={[styles.company, { color: C.textSecondary }]}>
-          {listing.company} · {listing.location}
+          {opportunity.organization} · {opportunity.location}
         </Text>
       </View>
 
@@ -61,12 +56,12 @@ const JobDetailHero = ({ listing, C }: JobDetailHeroProps) => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.pillRow}
         >
-          <Pill label={EMPLOYMENT_LABEL[listing.employmentType]} C={C} />
-          <Pill label={WORK_MODE_LABEL[listing.workMode]} C={C} />
-          <Pill label={listing.category} C={C} />
-          {isInternship && listing.academicCredit && (
-            <Pill label="Academic credit ✓" C={C} accent />
-          )}
+          <Pill label={opportunity.location} C={C} />
+          <Pill
+            label={`Apply by ${formatDeadline(opportunity.application_deadline)}`}
+            C={C}
+            accent={!closed && !!opportunity.application_deadline}
+          />
         </ScrollView>
       </View>
     </>
@@ -76,36 +71,24 @@ const JobDetailHero = ({ listing, C }: JobDetailHeroProps) => {
 export default JobDetailHero
 
 const styles = StyleSheet.create({
-  heroImage: { width: '100%', height: 250 },
-  heroImagePlaceholder: {
-    width: '100%',
-    height: 300,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  heroPlaceholderText: {
-    fontSize: 36,
-    fontWeight: '800',
-    opacity: 0.3,
-    letterSpacing: 8,
-  },
   titleBlock: { paddingTop: 20, paddingBottom: 12 },
   typeBadgeRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
   typeBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   badgeJob: { backgroundColor: '#DBEAFE' },
   badgeIntern: { backgroundColor: '#EDE9FE' },
   typeBadgeText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.3 },
-  openBadge: {
+  statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: '#D1FAE5',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 20,
   },
+  openBadge: { backgroundColor: '#D1FAE5' },
+  closedBadge: { backgroundColor: '#FFEDD5' },
   openDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#16A34A' },
-  openText: { fontSize: 11, fontWeight: '700', color: '#15803D' },
+  statusText: { fontSize: 11, fontWeight: '700' },
   jobTitle: {
     fontSize: 22,
     fontWeight: '700',
