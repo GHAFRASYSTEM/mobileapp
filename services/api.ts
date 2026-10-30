@@ -17,10 +17,33 @@ async function getToken(): Promise<string | null> {
   }
 }
 
+/** Error carrying the HTTP status and the backend `error.code`, so callers can
+ *  tell a 404 from a 410. The message is unchanged, so existing callers that
+ *  only read `err.message` behave exactly as before. */
+export class ApiError extends Error {
+  status: number;
+  code?: string;
+  constructor(message: string, status: number, code?: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
+/** Pagination block returned alongside list responses. */
+export type ApiMeta = {
+  total: number;
+  page:  number;
+  limit: number;
+  pages: number;
+};
+
 async function request<T>(
   path: string,
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE" = "GET",
   body?: Record<string, unknown> | FormData,
+  options?: { envelope?: boolean },
 ): Promise<T> {
   const token = await getToken();
   const headers: Record<string, string> = {
@@ -55,20 +78,28 @@ async function request<T>(
   if (!contentType.includes("application/json")) {
     const text = await res.text();
     console.error("[API] Unexpected response:", text.slice(0, 300));
-    throw new Error(
+    throw new ApiError(
       `Expected JSON but got ${contentType || "no content-type"} — status ${res.status}`,
+      res.status,
     );
   }
 
   const json = await res.json();
   if (!res.ok) {
-    throw new Error(json.error?.message ?? `Request failed: ${res.status}`);
+    throw new ApiError(
+      json.error?.message ?? `Request failed: ${res.status}`,
+      res.status,
+      json.error?.code,
+    );
   }
-  return json.data as T;
+  return (options?.envelope ? json : json.data) as T;
 }
 
 export const api = {
   get: <T>(path: string) => request<T>(path),
+  /** Like `get`, but keeps the response envelope so list `meta` survives. */
+  getWithMeta: <T>(path: string) =>
+    request<{ data: T; meta?: ApiMeta }>(path, "GET", undefined, { envelope: true }),
   post: <T>(path: string, body: Record<string, unknown> | FormData) =>
     request<T>(path, "POST", body),
   put: <T>(path: string, body: Record<string, unknown>) =>
