@@ -6,6 +6,7 @@ export default function CommunityLayout() {
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name='housing' options={{headerShown: false}}/>
       <Stack.Screen name='eventCalendar' options={{headerShown:false}}/>
+      <Stack.Screen name='attendance' options={{headerShown:false}}/>
       <Stack.Screen name='jobInternship' options={{headerShown:false}}/>
       <Stack.Screen name='ghafra_care' options={{headerShown:false}}/>
       <Stack.Screen name='gallery' options={{headerShown:false}}/>
