@@ -1,4 +1,4 @@
-import { api } from '@/services/api';
+import { api, ApiError } from '@/services/api';
 import { parisDateString, parisYear, addDays } from '@/utils/attendanceDate';
 import type {
   Meeting,
@@ -14,12 +14,12 @@ import type {
 // ─────────────────────────────────────────────────────────────────────────────
 // Attendance API (member endpoints). See the backend spec, base path /attendance.
 //
-// The backend is not deployed yet. While USE_MOCK is true, every call returns
-// the exact response shapes from the spec. Flip the MOCK_* flags below to see
-// each UI state.
+// Calls the deployed backend. For testing without it, set USE_MOCK to true:
+// every call then returns the exact response shapes from the spec, and the
+// MOCK_* flags below trigger each UI state.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const USE_MOCK = true as boolean;
+const USE_MOCK = false as boolean;
 
 // ── Mock flags ───────────────────────────────────────────────────────────────
 /** There is a meeting today (Paris). false = next meeting is in a week. */
@@ -79,62 +79,42 @@ function kindFromStatus(status: number): AttendanceErrorKind {
   if (status === 409) return 'CONFLICT';
   if (status === 422) return 'VALIDATION';
   if (status >= 500)  return 'SERVER';
-  return 'BAD_REQUEST';
+  // Other 4xx (e.g. 403) are treated like a 400. Their text is still only
+  // shown if it passes the check-in allow-list below.
+  if (status >= 400)  return 'BAD_REQUEST';
+  return 'SERVER';
 }
 
 /**
- * Turns whatever services/api.ts threw into an AttendanceError.
+ * Turns whatever services/api.ts threw into an AttendanceError, by HTTP status.
  *
- * TODO(api-errors): the message matching below is a stopgap. services/api.ts
- * currently throws a plain `Error` whose message is `json.error.message` (or
- * "Request failed: <status>" / "Expected JSON ... — status <status>"), so the
- * HTTP status is lost and `kindFromMessage` guesses it from the text.
- * The real fix, once the PR that adds `ApiError` (with `status` and `code`)
- * to services/api.ts is merged, is to switch to `ApiError.status` here:
- *
- *   if (err instanceof ApiError) {
- *     return new AttendanceError(kindFromStatus(err.status), err.message);
- *   }
- *
- * and delete `kindFromMessage`. Keep the allow-list in `toCheckInError` even
- * then: the backend can put raw database error text in the message, so only
- * the known check-in messages may ever be shown to members.
+ * - ApiError (any non-2xx response, including non-JSON bodies): mapped by
+ *   `status`. The message is kept only as `serverMessage`; the UI shows it
+ *   solely for check-in 400s that pass the allow-list (see toCheckInError).
+ * - TypeError: fetch() rejects with one ("Network request failed") when the
+ *   request never reached the server.
+ * - Anything else (e.g. an unparseable JSON body): treated as a server error.
  */
 export function toAttendanceError(err: unknown): AttendanceError {
   if (err instanceof AttendanceError) return err;
 
-  const msg = (err instanceof Error ? err.message : String(err ?? '')).trim();
-
-  // fetch() rejects with a TypeError ("Network request failed") when offline.
-  if (err instanceof TypeError || /network request failed|failed to fetch|network error|timed? ?out/i.test(msg)) {
-    return new AttendanceError('NETWORK', msg || null);
+  if (err instanceof ApiError) {
+    return new AttendanceError(kindFromStatus(err.status), err.message?.trim() || null);
   }
 
-  return new AttendanceError(kindFromMessage(msg), msg || null);
-}
+  if (err instanceof TypeError) {
+    return new AttendanceError('NETWORK', null);
+  }
 
-/** Best-effort HTTP status guess from the message text. See TODO above. */
-function kindFromMessage(msg: string): AttendanceErrorKind {
-  // Messages api.ts builds itself when the body has no error.message.
-  const statusMatch = msg.match(/Request failed: (\d{3})/) ?? msg.match(/status (\d{3})/);
-  if (statusMatch) return kindFromStatus(Number(statusMatch[1]));
-
-  if (/^validation failed$/i.test(msg))                                       return 'VALIDATION';   // 422
-  if (/not found/i.test(msg))                                                 return 'NOT_FOUND';    // 404
-  if (/already (checked|marked)/i.test(msg))                                  return 'CONFLICT';     // 409
-  if (/unauthori[sz]ed|invalid token|missing token|expired token|jwt|not authenticated/i.test(msg)) return 'UNAUTHORIZED'; // 401
-  if (!msg || /internal server error|server error|something went wrong/i.test(msg)) return 'SERVER';
-
-  // Anything else with a readable message is treated as a 400 rule message.
-  // toCheckInError() decides whether that text may be shown.
-  return 'BAD_REQUEST';
+  return new AttendanceError('SERVER', null);
 }
 
 // ── Check-in messages safe to show ───────────────────────────────────────────
-// The backend's 400 rule messages for POST /attendance/check-in. A message is
-// shown to the member only if it starts with (or equals) one of these,
-// case-insensitive. Anything else (unknown 400s, raw database errors) gets the
-// generic "couldn't be submitted" feedback instead.
+// The backend's 400 rule messages for POST /attendance/check-in. Even with the
+// HTTP status available, the backend can still put raw database text in an
+// error message, so a 400 message is shown to the member only if it starts
+// with (or equals) one of these, case-insensitive. Anything else (unknown 400s,
+// raw database errors) gets the generic "couldn't be submitted" feedback.
 const KNOWN_CHECK_IN_PREFIXES = [
   'this meeting was cancelled',
   'check-in is not open for this meeting',
@@ -281,23 +261,24 @@ function mockMyAttendance(year: number): MyAttendance {
 
 /** Throws exactly what services/api.ts would throw for each failure. */
 function throwMockFailure(f: MockFailure): never {
+  const bad = (msg: string) => new ApiError(msg, 400, 'BAD_REQUEST');
   switch (f) {
-    case 'cancelled':     throw new Error('This meeting was cancelled');
-    case 'closed':        throw new Error('Check-in is not open for this meeting');
-    case 'not_today':     throw new Error('Check-in is only open on the day of the meeting');
-    case 'not_started':   throw new Error('Check-in has not opened yet');
-    case 'ended':         throw new Error('Check-in has closed');
-    case 'wrong_code':    throw new Error('Invalid check-in code');
-    case 'weak_accuracy': throw new Error('Your location is not precise enough');
-    case 'too_far':       throw new Error('You are 340 m from the meeting. Check-in requires being within 100 m');
-    case 'unknown_400':   throw new Error('Request failed: 400');
-    case 'db_error':      throw new Error('duplicate key value violates unique constraint "attendance_records_meeting_id_user_id_key"');
-    case 'conflict':      throw new Error('You have already checked in to this meeting');
-    case 'not_found':     throw new Error('Meeting not found');
-    case 'unauthorized':  throw new Error('Unauthorized');
-    case 'validation':    throw new Error('Validation failed');
+    case 'cancelled':     throw bad('This meeting was cancelled');
+    case 'closed':        throw bad('Check-in is not open for this meeting');
+    case 'not_today':     throw bad('Check-in is only open on the day of the meeting');
+    case 'not_started':   throw bad('Check-in has not opened yet');
+    case 'ended':         throw bad('Check-in has closed');
+    case 'wrong_code':    throw bad('Invalid check-in code');
+    case 'weak_accuracy': throw bad('Your location is not precise enough');
+    case 'too_far':       throw bad('You are 340 m from the meeting. Check-in requires being within 100 m');
+    case 'unknown_400':   throw bad('Request failed: 400');
+    case 'db_error':      throw bad('duplicate key value violates unique constraint "attendance_records_meeting_id_user_id_key"');
+    case 'conflict':      throw new ApiError('You have already checked in to this meeting', 409, 'CONFLICT');
+    case 'not_found':     throw new ApiError('Meeting not found', 404, 'NOT_FOUND');
+    case 'unauthorized':  throw new ApiError('Unauthorized', 401, 'UNAUTHORIZED');
+    case 'validation':    throw new ApiError('Validation failed', 422, 'VALIDATION_ERROR');
     case 'network':       throw new TypeError('Network request failed');
-    case 'server':        throw new Error('Request failed: 500');
+    case 'server':        throw new ApiError('Request failed: 500', 500);
   }
 }
 
