@@ -5,21 +5,31 @@ import type { Tab } from '../Tabs/JobTabs'
 
 interface EmptyStateProps {
   activeTab: Tab
+  /** Set when the list is empty because of a search, not because nothing is posted. */
+  search?: string
 }
 
-const JobEmptyState = ({ activeTab }: EmptyStateProps) => {
+const LABELS: Record<Tab, { title: string; body: string }> = {
+  all:         { title: 'Opportunities',      body: 'opportunities' },
+  jobs:        { title: 'Jobs',               body: 'job openings' },
+  internships: { title: 'Internships',        body: 'internship positions' },
+}
+
+const JobEmptyState = ({ activeTab, search }: EmptyStateProps) => {
   const C = useColors()
-  const isJobs = activeTab === 'jobs'
+  const label = LABELS[activeTab]
+  const query = search?.trim()
 
   return (
     <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
-      <Text style={styles.illustration}>📭</Text>
+      <Text style={styles.illustration}>{query ? '🔍' : '📭'}</Text>
       <Text style={[styles.title, { color: C.textPrimary }]}>
-        No {isJobs ? 'Jobs' : 'Internships'} Available
+        {query ? 'No Matches Found' : `No ${label.title} Available`}
       </Text>
       <Text style={[styles.body, { color: C.textSecondary }]}>
-        There are no {isJobs ? 'job openings' : 'internship positions'} posted at the moment.
-        Check back soon — new opportunities are added regularly.
+        {query
+          ? `Nothing matched “${query}”. Try a different title or organization.`
+          : `There are no ${label.body} posted at the moment. Check back soon — new opportunities are added regularly.`}
       </Text>
     </View>
   )
