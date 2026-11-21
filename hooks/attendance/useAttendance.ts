@@ -63,12 +63,12 @@ const WEAK_ACCURACY: AttendanceFeedback = {
 function submitErrorFeedback(e: AttendanceError): AttendanceFeedback {
   switch (e.kind) {
     case 'BAD_REQUEST':
-      // Closed, wrong code, too far and weak accuracy all share 400:
-      // the server's message says which one.
+      // Closed, wrong code, too far and weak accuracy all share 400. Only
+      // known check-in messages arrive here (toCheckInError filters the rest).
       return {
         tone: 'error',
         title: "Attendance wasn't recorded",
-        message: e.serverMessage || 'Check-in was refused. Check the code and try again.',
+        message: e.serverMessage || "Attendance couldn't be submitted. Try again in a moment.",
       };
     case 'CONFLICT':
       return {
@@ -103,10 +103,12 @@ function submitErrorFeedback(e: AttendanceError): AttendanceFeedback {
       };
     case 'SERVER':
     default:
+      // Also used for unknown 400s and raw server/database text
+      // (see toCheckInError in services/attendanceApi.ts).
       return {
         tone: 'error',
-        title: 'Server error',
-        message: 'Something went wrong on our side. Try again in a moment.',
+        title: "Attendance couldn't be submitted",
+        message: 'Try again in a moment.',
         action: 'retry',
       };
   }

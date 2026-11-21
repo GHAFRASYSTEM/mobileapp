@@ -41,10 +41,16 @@ const MOCK_CODE               = 'K7QX3M';
 const MOCK_DELAY_MS           = 700;
 
 type MockFailure =
-  | 'closed'          // 400 check-in not open
+  | 'cancelled'       // 400 This meeting was cancelled
+  | 'closed'          // 400 Check-in is not open for this meeting (is_active false)
+  | 'not_today'       // 400 Check-in is only open on the day of the meeting
+  | 'not_started'     // 400 Check-in has not opened yet (before starts_at)
+  | 'ended'           // 400 Check-in has closed (after ends_at)
   | 'wrong_code'      // 400 Invalid check-in code
-  | 'weak_accuracy'   // 400 accuracy worse than 100 m
-  | 'too_far'         // 400 outside radius_m
+  | 'weak_accuracy'   // 400 Your location is not precise enough
+  | 'too_far'         // 400 You are <n> m from the meeting...
+  | 'unknown_400'     // 400 with a message we don't recognise -> generic
+  | 'db_error'        // raw database error text -> generic
   | 'conflict'        // 409 already checked in
   | 'not_found'       // 404 meeting not found
   | 'unauthorized'    // 401 token missing/invalid
@@ -79,18 +85,20 @@ function kindFromStatus(status: number): AttendanceErrorKind {
 /**
  * Turns whatever services/api.ts threw into an AttendanceError.
  *
- * TODO(api-errors): services/api.ts currently throws a plain `Error` whose
- * message is `json.error.message` (or "Request failed: <status>" /
- * "Expected JSON ... — status <status>"), so the HTTP status is lost and we
- * have to guess it from the message text below. Once services/api.ts exports
- * `ApiError` (with `status` and `code`), replace the message matching in this
- * function with:
+ * TODO(api-errors): the message matching below is a stopgap. services/api.ts
+ * currently throws a plain `Error` whose message is `json.error.message` (or
+ * "Request failed: <status>" / "Expected JSON ... — status <status>"), so the
+ * HTTP status is lost and `kindFromMessage` guesses it from the text.
+ * The real fix, once the PR that adds `ApiError` (with `status` and `code`)
+ * to services/api.ts is merged, is to switch to `ApiError.status` here:
  *
  *   if (err instanceof ApiError) {
  *     return new AttendanceError(kindFromStatus(err.status), err.message);
  *   }
  *
- * and delete `kindFromMessage`.
+ * and delete `kindFromMessage`. Keep the allow-list in `toCheckInError` even
+ * then: the backend can put raw database error text in the message, so only
+ * the known check-in messages may ever be shown to members.
  */
 export function toAttendanceError(err: unknown): AttendanceError {
   if (err instanceof AttendanceError) return err;
@@ -117,9 +125,46 @@ function kindFromMessage(msg: string): AttendanceErrorKind {
   if (/unauthori[sz]ed|invalid token|missing token|expired token|jwt|not authenticated/i.test(msg)) return 'UNAUTHORIZED'; // 401
   if (!msg || /internal server error|server error|something went wrong/i.test(msg)) return 'SERVER';
 
-  // Anything else with a readable message is treated as a 400 rule message
-  // (check-in closed, wrong code, too far, weak accuracy...).
+  // Anything else with a readable message is treated as a 400 rule message.
+  // toCheckInError() decides whether that text may be shown.
   return 'BAD_REQUEST';
+}
+
+// ── Check-in messages safe to show ───────────────────────────────────────────
+// The backend's 400 rule messages for POST /attendance/check-in. A message is
+// shown to the member only if it starts with (or equals) one of these,
+// case-insensitive. Anything else (unknown 400s, raw database errors) gets the
+// generic "couldn't be submitted" feedback instead.
+const KNOWN_CHECK_IN_PREFIXES = [
+  'this meeting was cancelled',
+  'check-in is not open for this meeting',
+  'check-in is only open on the day of the meeting',
+  'check-in has not opened yet',
+  'check-in has closed',
+  'invalid check-in code',
+  'your location is not precise enough',
+];
+// "You are 340 m from the meeting. Check-in requires being within 100 m"
+const TOO_FAR_PATTERN = /^you are \d+(?:[.,]\d+)? ?m from the meeting/i;
+
+export function isKnownCheckInMessage(msg: string | null | undefined): boolean {
+  if (!msg) return false;
+  const m = msg.trim().toLowerCase();
+  return KNOWN_CHECK_IN_PREFIXES.some(p => m.startsWith(p)) || TOO_FAR_PATTERN.test(m);
+}
+
+/**
+ * Like toAttendanceError, but a 400 keeps its server text only when that text
+ * is a known check-in message. Any other 400 (and any 5xx) becomes SERVER with
+ * no message, so raw server text never reaches the UI. 401/404/409/422 and
+ * network errors are unchanged; their UI copy never shows server text.
+ */
+export function toCheckInError(err: unknown): AttendanceError {
+  const e = toAttendanceError(err);
+  if (e.kind === 'SERVER' || (e.kind === 'BAD_REQUEST' && !isKnownCheckInMessage(e.serverMessage))) {
+    return new AttendanceError('SERVER', null);
+  }
+  return e;
 }
 
 // ── Mock data ────────────────────────────────────────────────────────────────
@@ -237,10 +282,16 @@ function mockMyAttendance(year: number): MyAttendance {
 /** Throws exactly what services/api.ts would throw for each failure. */
 function throwMockFailure(f: MockFailure): never {
   switch (f) {
+    case 'cancelled':     throw new Error('This meeting was cancelled');
     case 'closed':        throw new Error('Check-in is not open for this meeting');
+    case 'not_today':     throw new Error('Check-in is only open on the day of the meeting');
+    case 'not_started':   throw new Error('Check-in has not opened yet');
+    case 'ended':         throw new Error('Check-in has closed');
     case 'wrong_code':    throw new Error('Invalid check-in code');
-    case 'weak_accuracy': throw new Error('Location accuracy is too low (150 m). It must be 100 m or better');
-    case 'too_far':       throw new Error('You are 340 m from the meeting point (limit 100 m)');
+    case 'weak_accuracy': throw new Error('Your location is not precise enough');
+    case 'too_far':       throw new Error('You are 340 m from the meeting. Check-in requires being within 100 m');
+    case 'unknown_400':   throw new Error('Request failed: 400');
+    case 'db_error':      throw new Error('duplicate key value violates unique constraint "attendance_records_meeting_id_user_id_key"');
     case 'conflict':      throw new Error('You have already checked in to this meeting');
     case 'not_found':     throw new Error('Meeting not found');
     case 'unauthorized':  throw new Error('Unauthorized');
@@ -277,30 +328,46 @@ export const attendanceApi = {
     return api.get<MyAttendance>(`/attendance/me?year=${year}`);
   },
 
-  /** POST /attendance/check-in */
+  /**
+   * POST /attendance/check-in
+   * Errors go through toCheckInError, so only known server messages can
+   * reach the UI.
+   */
   async checkIn(body: CheckInRequest): Promise<CheckInResponse> {
-    if (USE_MOCK) {
-      await wait(1000);
-      if (MOCK_CHECKIN_FAIL) throwMockFailure(MOCK_CHECKIN_FAIL);
-
-      // Same order of checks as the server.
-      const meeting = mockCurrentMeeting();
-      if (body.meeting_id !== meeting.id)                         throwMockFailure('not_found');
-      if (!meeting.is_active || meeting.meeting_date !== parisDateString()) throwMockFailure('closed');
-      if (body.check_in_code.trim().toUpperCase() !== MOCK_CODE)  throwMockFailure('wrong_code');
-      if (body.accuracy > 100)                                    throwMockFailure('weak_accuracy');
-      if (mockCheckedIn)                                          throwMockFailure('conflict');
-
-      mockCheckedIn  = true;
-      mockRecordedAt = new Date().toISOString();
-      return {
-        id:          mockUuid(Date.now()),
-        meeting_id:  meeting.id,
-        status:      'attended',
-        recorded_at: mockRecordedAt,
-        distance_m:  18.4,
-      };
+    try {
+      return USE_MOCK
+        ? await mockCheckIn(body)
+        : await api.post<CheckInResponse>('/attendance/check-in', body);
+    } catch (err) {
+      throw toCheckInError(err);
     }
-    return api.post<CheckInResponse>('/attendance/check-in', body);
   },
 };
+
+async function mockCheckIn(body: CheckInRequest): Promise<CheckInResponse> {
+  await wait(1000);
+  if (MOCK_CHECKIN_FAIL) throwMockFailure(MOCK_CHECKIN_FAIL);
+
+  // Same order of checks as the server.
+  const meeting = mockCurrentMeeting();
+  const now     = Date.now();
+  if (body.meeting_id !== meeting.id)                                throwMockFailure('not_found');
+  if (meeting.cancelled_at)                                          throwMockFailure('cancelled');
+  if (!meeting.is_active)                                            throwMockFailure('closed');
+  if (meeting.meeting_date !== parisDateString())                    throwMockFailure('not_today');
+  if (meeting.starts_at && now < Date.parse(meeting.starts_at))      throwMockFailure('not_started');
+  if (meeting.ends_at && now > Date.parse(meeting.ends_at))          throwMockFailure('ended');
+  if (body.check_in_code.trim().toUpperCase() !== MOCK_CODE)         throwMockFailure('wrong_code');
+  if (body.accuracy > 100)                                           throwMockFailure('weak_accuracy');
+  if (mockCheckedIn)                                                 throwMockFailure('conflict');
+
+  mockCheckedIn  = true;
+  mockRecordedAt = new Date().toISOString();
+  return {
+    id:          mockUuid(Date.now()),
+    meeting_id:  meeting.id,
+    status:      'attended',
+    recorded_at: mockRecordedAt,
+    distance_m:  18.4,
+  };
+}
