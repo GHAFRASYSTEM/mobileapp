@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useColors } from '@/constants/Colors'
 
-export type Tab = 'jobs' | 'internships'
+export type Tab = 'all' | 'jobs' | 'internships'
 
 interface JobTabsProps {
   activeTab: Tab
@@ -10,6 +10,7 @@ interface JobTabsProps {
 }
 
 const TABS: { key: Tab; label: string }[] = [
+  { key: 'all', label: 'All' },
   { key: 'jobs', label: 'Jobs' },
   { key: 'internships', label: 'Internships' },
 ]
