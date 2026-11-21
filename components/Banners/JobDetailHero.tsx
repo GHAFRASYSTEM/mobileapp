@@ -3,6 +3,7 @@ import React from 'react'
 import type { Opportunity } from '@/types/opportunities'
 import { Pill } from '../ui/DetailAtoms'
 import { closedLabel, formatDeadline, isOpportunityClosed } from '@/utils/opportunities'
+import OpportunityCover from '@/components/Images/OpportunityCover'
 
 interface JobDetailHeroProps {
   opportunity: Opportunity
@@ -15,6 +16,8 @@ const JobDetailHero = ({ opportunity, C }: JobDetailHeroProps) => {
 
   return (
     <>
+      <OpportunityCover uri={opportunity.image_url} backgroundColor={C.border} />
+
       {/* ── Title block ── */}
       <View style={[styles.titleBlock, { paddingHorizontal: 20 }]}>
         <View style={styles.typeBadgeRow}>

@@ -40,7 +40,10 @@ export interface Opportunity {
   contact_email: string | null;
   contact_phone: string | null;
 
-  status:       OpportunityStatus;
+  /** Public cover image URL. `null` (or absent) when the listing has no image. */
+  image_url?: string | null;
+
+  status:      OpportunityStatus;
   published_at: string | null;
   closed_at:    string | null;
   created_at:   string;

@@ -3,6 +3,7 @@ import React from 'react'
 import { useColors } from '@/constants/Colors'
 import type { Opportunity } from '@/types/opportunities'
 import { closedLabel, formatDeadline, isOpportunityClosed } from '@/utils/opportunities'
+import OpportunityCover from '@/components/Images/OpportunityCover'
 
 // ─── component ───────────────────────────────────────────────────────────────
 
@@ -24,6 +25,8 @@ const JobCard = ({ opportunity, onPress }: JobCardProps) => {
       activeOpacity={0.88}
       onPress={() => onPress(opportunity)}
     >
+      <OpportunityCover uri={opportunity.image_url} backgroundColor={C.border} />
+
       <View style={styles.body}>
         {/* ── Badges ── */}
         <View style={styles.badgeRow}>
