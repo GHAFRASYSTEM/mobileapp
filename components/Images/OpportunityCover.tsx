@@ -25,7 +25,6 @@ const OpportunityCover = ({ uri, backgroundColor }: OpportunityCoverProps) => {
       source={{ uri: src }}
       style={[styles.cover, { backgroundColor }]}
       contentFit="cover"
-      transition={200}
       accessible={false}
       onError={() => setFailedUri(src)}
     />
