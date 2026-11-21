@@ -52,6 +52,14 @@ export const SECTIONS: Section[] = [
     accent:   '#FFF8DC',
     accentTx: '#7A5500',
   },
+  {
+    label:    'Attendance',
+    sub:      'Check in at meetings & see your history',
+    icon:     'how-to-reg',
+    route:    '/(tabs)/(community)/attendance',
+    accent:   '#E8F5EE',
+    accentTx: '#006B3F',
+  },
     {
     label:    'Tour & Explore',
     sub:      'Discover cities, culture, and hidden gems',
