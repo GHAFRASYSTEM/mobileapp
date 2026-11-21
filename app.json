@@ -83,6 +83,12 @@
         {
           "microphonePermission": "Allow GHAFRA to access your microphone for voice recording and pronunciation practice."
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow GHAFRA to use your location to confirm you are at the meeting."
+        }
       ]
     ],
     "experiments": {
