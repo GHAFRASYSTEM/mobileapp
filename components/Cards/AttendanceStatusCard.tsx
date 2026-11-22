@@ -1,58 +1,75 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useColors } from '@/constants/Colors';
 import PrimaryButton from '@/components/Buttons/PrimaryButton';
-import type { AttendanceStatus, AttendanceFeedback } from '@/types/attendance';
+import { Input } from '@/components/Inputs/Input';
+import { formatMeetingDay, formatParisTime } from '@/utils/attendanceDate';
+import type {
+  CurrentMeetingState,
+  SubmitPhase,
+  AttendanceFeedback,
+} from '@/types/attendance';
 
 type Props = {
-  status:    AttendanceStatus;
-  opening:   boolean;
-  feedback:  AttendanceFeedback | null;
-  onMark:    () => void;
-  onDismiss: () => void;
+  current:      CurrentMeetingState;
+  code:         string;
+  onChangeCode: (code: string) => void;
+  phase:        SubmitPhase;
+  feedback:     AttendanceFeedback | null;
+  onSubmit:     () => void;
+  onDismiss:    () => void;
 };
 
 type IconName = React.ComponentProps<typeof MaterialIcons>['name'];
 
 export default function AttendanceStatusCard({
-  status, opening, feedback, onMark, onDismiss,
+  current, code, onChangeCode, phase, feedback, onSubmit, onDismiss,
 }: Props) {
   const C = useColors();
+  const { meeting, isToday, canCheckIn, alreadyCheckedIn } = current;
+  const busy = phase !== 'idle';
 
-  const dateStr = status.meetingDate
-    ? new Date(status.meetingDate).toLocaleDateString('en-GB', {
-        weekday: 'long', day: 'numeric', month: 'long',
-      })
-    : 'Date to be confirmed';
+  const dateStr  = formatMeetingDay(meeting.meeting_date);
+  const start    = formatParisTime(meeting.starts_at);
+  const end      = formatParisTime(meeting.ends_at);
+  const timeStr  = start && end ? `${start} – ${end}` : start ? `From ${start}` : end ? `Until ${end}` : null;
 
   // ── Status pill ────────────────────────────────────────────────────────────
-  const pill = status.alreadySubmitted
-    ? { label: 'Recorded', bg: C.primarySubtle, fg: C.primary, icon: 'check-circle' as IconName }
-    : status.isActive
-    ? { label: 'Open now', bg: C.goldSubtle, fg: C.textWarning, icon: 'radio-button-checked' as IconName }
-    : { label: 'Not open', bg: C.border, fg: C.textMuted, icon: 'schedule' as IconName };
+  const pill = alreadyCheckedIn
+    ? { label: 'Checked in', bg: C.primarySubtle, fg: C.primary,     icon: 'check-circle' as IconName }
+    : canCheckIn
+    ? { label: 'Open now',   bg: C.goldSubtle,    fg: C.textWarning, icon: 'radio-button-checked' as IconName }
+    : { label: 'Not open',   bg: C.border,        fg: C.textMuted,   icon: 'schedule' as IconName };
 
   const buttonText =
-    opening                    ? 'Opening website…'
-    : status.alreadySubmitted  ? 'Attendance recorded'
-    : 'Mark attendance';
+    phase === 'locating'     ? 'Getting your location...'
+    : phase === 'submitting' ? 'Submitting...'
+    : alreadyCheckedIn       ? 'Attendance recorded'
+    : 'Submit attendance';
 
-  const canSubmit = status.isActive && !status.alreadySubmitted;
+  const hint = alreadyCheckedIn
+    ? null
+    : canCheckIn
+    ? 'Enter the code announced in the room. Your location is checked once, when you submit.'
+    : isToday
+    ? "Check-in isn't open yet. It opens when the organisers start it during the meeting."
+    : 'Check-in opens on the day of the meeting.';
+
+  const showCodeInput = isToday && !alreadyCheckedIn;
 
   return (
     <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
-      <View style={[styles.accentBar, { backgroundColor: canSubmit ? C.gold : C.primary }]} />
+      <View style={[styles.accentBar, { backgroundColor: canCheckIn ? C.gold : C.primary }]} />
 
       <View style={styles.inner}>
         {/* Header */}
         <View style={styles.headerRow}>
           <View style={styles.headerText}>
-            <Text style={[styles.title, { color: C.textPrimary }]}>{status.meetingTitle}</Text>
-            <View style={styles.dateRow}>
-              <MaterialIcons name="event" size={13} color={C.textSecondary} />
-              <Text style={[styles.date, { color: C.textSecondary }]}>{dateStr}</Text>
-            </View>
+            <Text style={[styles.title, { color: C.textPrimary }]}>{meeting.title}</Text>
+            <MetaRow icon="event" text={dateStr} />
+            {timeStr && <MetaRow icon="schedule" text={timeStr} />}
+            {meeting.location_name && <MetaRow icon="place" text={meeting.location_name} />}
           </View>
           <View style={[styles.pill, { backgroundColor: pill.bg }]}>
             <MaterialIcons name={pill.icon} size={12} color={pill.fg} />
@@ -60,26 +77,58 @@ export default function AttendanceStatusCard({
           </View>
         </View>
 
-        {/* Hint */}
-        {!status.alreadySubmitted && (
-          <Text style={[styles.hint, { color: C.textMuted }]}>
-            {status.isActive
-              ? "You'll continue on the GHAFRA website, which checks that you're at the venue."
-              : 'Attendance opens during the meeting.'}
-          </Text>
+        {hint && <Text style={[styles.hint, { color: C.textMuted }]}>{hint}</Text>}
+
+        {/* Code */}
+        {showCodeInput && (
+          <Input
+            label="Check-in code"
+            value={code}
+            onChangeText={onChangeCode}
+            placeholder="e.g. K7QX3M"
+            placeholderTextColor={C.textMuted}
+            autoCapitalize="characters"
+            autoCorrect={false}
+            autoComplete="off"
+            spellCheck={false}
+            textContentType="none"
+            returnKeyType="done"
+            maxLength={32}
+            editable={canCheckIn && !busy}
+            onSubmitEditing={onSubmit}
+            accessibilityLabel="Check-in code"
+            style={[
+              styles.codeInput,
+              {
+                backgroundColor: C.background,
+                color:           C.textPrimary,
+                borderColor:     C.border,
+                opacity:         canCheckIn ? 1 : 0.6,
+              },
+            ]}
+          />
         )}
 
         {/* Feedback */}
-        {feedback && <FeedbackBanner feedback={feedback} onRetry={onMark} onDismiss={onDismiss} />}
+        {feedback && <FeedbackBanner feedback={feedback} onRetry={onSubmit} onDismiss={onDismiss} />}
 
         {/* Action */}
         <PrimaryButton
           text={buttonText}
-          onPress={onMark}
-          loading={opening}
-          disabled={!canSubmit}
+          onPress={onSubmit}
+          disabled={!canCheckIn || busy}
         />
       </View>
+    </View>
+  );
+}
+
+function MetaRow({ icon, text }: { icon: IconName; text: string }) {
+  const C = useColors();
+  return (
+    <View style={styles.metaRow}>
+      <MaterialIcons name={icon} size={13} color={C.textSecondary} />
+      <Text style={[styles.meta, { color: C.textSecondary }]}>{text}</Text>
     </View>
   );
 }
@@ -100,6 +149,13 @@ function FeedbackBanner({
     error:   { bg: C.dangerSubtle,  fg: C.textDanger,  icon: 'error'        as IconName },
   }[feedback.tone];
 
+  const action =
+    feedback.action === 'settings'
+      ? { label: 'Open settings', onPress: () => { Linking.openSettings().catch(() => {}); } }
+      : feedback.action === 'retry'
+      ? { label: 'Try again', onPress: onRetry }
+      : null;
+
   return (
     <View style={[styles.banner, { backgroundColor: tone.bg }]} accessibilityRole="alert">
       <MaterialIcons name={tone.icon} size={18} color={tone.fg} style={styles.bannerIcon} />
@@ -107,14 +163,14 @@ function FeedbackBanner({
         <Text style={[styles.bannerTitle, { color: tone.fg }]}>{feedback.title}</Text>
         <Text style={[styles.bannerMsg, { color: tone.fg }]}>{feedback.message}</Text>
 
-        {feedback.action && (
+        {action && (
           <TouchableOpacity
-            onPress={onRetry}
+            onPress={action.onPress}
             style={styles.bannerAction}
             activeOpacity={0.7}
           >
             <Text style={[styles.bannerActionText, { color: tone.fg }]}>
-              Try again
+              {action.label}
             </Text>
           </TouchableOpacity>
         )}
@@ -134,13 +190,15 @@ const styles = StyleSheet.create({
   headerRow:   { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 },
   headerText:  { flex: 1, gap: 4 },
   title:       { fontSize: 18, fontWeight: '800' },
-  dateRow:     { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  date:        { fontSize: 13 },
+  metaRow:     { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  meta:        { fontSize: 13, flexShrink: 1 },
 
   pill:        { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 9, paddingVertical: 4, borderRadius: 20 },
   pillText:    { fontSize: 11, fontWeight: '700' },
 
   hint:        { fontSize: 12, lineHeight: 17 },
+
+  codeInput:   { fontSize: 18, fontWeight: '700', letterSpacing: 3 },
 
   banner:           { flexDirection: 'row', gap: 10, padding: 12, borderRadius: 12 },
   bannerIcon:       { marginTop: 1 },
